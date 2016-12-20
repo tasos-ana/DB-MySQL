@@ -18,6 +18,10 @@ and open the template in the editor.
         <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js" type="text/javascript"></script>
         <link rel="stylesheet" href="bootstrap/css/bootstrap.css" type="text/css">
 
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
         <link href="CSS/index.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
@@ -45,30 +49,38 @@ and open the template in the editor.
 
                     <ul class="nav navbar-nav navbar-right">
                         <li id="login_but" data-visible="inline" onclick="requestLoginPage()"><a href="#"><span id="usr_login" class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                        <li id="create_account_but" data-visible="inline" onclick="requestRegisterPage()"><a href="#"><span id="usr_register" class="glyphicon glyphicon-pencil"></span> Create account</a></li>
+                        <li id="create_account_but" data-visible="inline" onclick="requestCreateAccountPage()"><a href="#"><span id="usr_register" class="glyphicon glyphicon-pencil"></span> Create account</a></li>
 
-                        <li id="close_account_but" data-visible="none" onclick="ajaxUserProfileRequest()"><a href="#"><span id="usr_settings" class="glyphicon glyphicon-cog"></span> Close Account</a></li>
+                        <li id="close_account_but" data-visible="none" onclick="ajaxCloseAccountRequest()"><a href="#"><span id="usr_settings" class="glyphicon glyphicon-cog"></span> Close Account</a></li>
                         <li id="logout_but" data-visible="none" onclick="ajaxLogoutRequest()"><a href="#"><span id="usr_logout" class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
-        <!--Main container-->
-        <div id="main_container" class="container text-center animate-bottom">
-            
-            
+        <!--Welcome container-->
+        <div id="welcome_container" class="container text-center make_hide">
+            <h1 class="welcome_txt_style">Welcome! </h1>
+            <h4>Now the receipts of your business <br> 
+                become more quickly than ever</h4><br>
+            <button type="button" class="btn btn-default btn_style"  
+                    onclick="function () {
+                                document.getElementById('create_account_but').click();
+                            }">
+                Open an account Now!
+            </button>
         </div>
+        <!--Main container-->
+        <div id="main_container" class="container text-center"></div>
         <!-- The loading Modal -->
         <div id="loadingModal" class="loadingModal container">
             <div id="myLoader" class="tab-pane fade active in"><img src="Media/loader.svg" alt=""></div>
-            <div id="upload_status"></div>
         </div>    
         <div class="page-header page-header_bottom"></div>
         <!--Footer-->
         <nav id="footer_nav" class="navbar footer-default navbar-fixed-bottom">
             <div class="container">
                 <p id="footer_txt" class="text-center">
-                    Designed and Developed By Tasos Anastasas & Giwrgos Giakoumis. &copy; 2016<br>
+                    Designed and Developed By Tasos Anastasas & Giwrgos Giakoumis. &copy; 2017<br>
                 </p> 
             </div>
         </nav>
