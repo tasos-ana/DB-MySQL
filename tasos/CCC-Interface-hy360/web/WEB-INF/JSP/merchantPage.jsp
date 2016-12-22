@@ -13,12 +13,6 @@
         $("#datepickerbefore").datepicker();
     });
 </script>
-<div class="row">
-
-    <div class="col-sm-1"></div>
-
-</div>
-
 <div class="container">
     <h2>Merchant dashboard</h2>
 
@@ -59,7 +53,7 @@
             </div>
         </div>
         <div id="debt" class="tab-pane fade">
-            <form class="col-sm-3">
+            <form>
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>

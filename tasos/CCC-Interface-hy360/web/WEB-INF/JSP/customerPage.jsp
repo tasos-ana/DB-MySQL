@@ -55,8 +55,8 @@
             </div>
         </div>
         <div id="buy" class="tab-pane fade">
-            <form class="col-sm-3">
-                <fieldset>
+            <form>
+                <fieldset class="fieldset-auto-width">
                     <legend class="legend_text">Buy goods</legend>
                     <div class="title_text">Merchant:</div>
                     <input type="text" class="text-center" placeholder="Required" size="30" pattern="[a-zA-Z0-9]+"><br>
@@ -69,8 +69,8 @@
                 </fieldset>
             </form>
         </div>
-        <div id="debt" class="tab-pane fade in active">
-            <form class="col-sm-3">
+        <div id="debt" class="tab-pane fade in">
+            <form>
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
@@ -85,7 +85,7 @@
             </form>
         </div>
         <div id="refund" class="tab-pane fade">
-            <form class="col-sm-3">
+            <form>
                 <fieldset>
                     <legend>Refund</legend>
                     <div class="title_text">Merchant:</div>

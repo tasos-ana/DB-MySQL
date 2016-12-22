@@ -103,3 +103,7 @@ function pagePrepare() {
     document.getElementById("loadingModal").style.display = "block";
     document.getElementById("main_container").style.display = "none";
 }
+
+function test(){
+    window.alert("sssss");
+}

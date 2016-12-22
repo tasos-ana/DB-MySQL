@@ -75,9 +75,9 @@ function ajaxOpenAccountRequest() {
         xhr.setRequestHeader('action', 'open');
         document.getElementById("loadingModal").style.display = "block";
 
-        type = document.getElementById("user_account_type").value;
+        type = document.getElementById("user_account_type");
         email = document.getElementById("usr_email");
-        xhr.send('email=' + email + '&type=' + type);
+        xhr.send('email=' + email.value + '&type=' + type.value);
     } else {
         document.getElementById("form_alert").removeAttribute("hidden");
         document.getElementById("form_alert").addEventListener("mouseover", setTimeout(function () {
@@ -129,6 +129,35 @@ function ajaxLogoutRequest() {
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader('action', 'logout');
     xhr.send();
+}
+
+function ajaxEmployeeAction() {
+    var accountNumber, accountName, accountType, action;
+    accountNumber = document.employee.accountNumber;
+    accountName = document.employee.accountName;
+    accountType = document.employee.accountType;
+    action = document.employee.action;
+    if (accountName.checkValidity()) {
+        var xhr;
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                    document.getElementById("home_but").click();
+                } else {
+                    //TODO
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
+            }
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('action', action.value);
+        xhr.send("accountNumber=" + accountNumber.value + 
+                 "&accountName="  + accountName.value   + 
+                 "&accountType=" + accountType.value);
+    }
 }
 
 function setWelcomeMessage(email) {

@@ -12,7 +12,6 @@
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor">Home</a></li>
         <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Add employee</a></li>
-        <li><a data-toggle="tab" href="#removeEmployee" class="darkcolor">Remove employee</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>
 
@@ -46,15 +45,41 @@
                 </div>
             </div>
         </div>
-
         <div id="addEmployee" class="tab-pane fade">
+            <form name="employee">
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="title_text col-sm-2">
+                        Account number:
+                        <input type="text" name="accountNumber" value="1234 5678 9123 4567"  readonly>
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <div class="title_text col-sm-2">
+                        Employee name:
+                        <input type="text" name="accountName" placeholder="e.g Tasos" required size="30" pattern="[a-zA-Z0-9]+">
+                    </div>
+                    <div class="col-sm-3"></div>
+                </div>
 
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-2">
+                        <span class="title_text">Account type:</span><br>
+                        <input type="radio" name="accountType" value="customer" checked>Customer
+                        <input type="radio" name="accountType" value="merchant">Merchant
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-2">
+                        <span class="title_text">Action:</span><br>
+                        <input type="radio" name="action" value="addEmployee" checked>Add
+                        <input type="radio" name="action" value="removeEmployee">Remove
+                    </div>
+                    <div class="col-sm-3"></div>
+                </div>
+                
+                <button type="button" class="btn_style" onclick="ajaxEmployeeAction()">Submit</button>
+            </form>
         </div>
-
-        <div id="removeEmployee" class="tab-pane fade">
-
-        </div>
-
         <div id="search" class="tab-pane fade">
 
         </div>
