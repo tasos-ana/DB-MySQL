@@ -4,7 +4,7 @@ function ajaxLoginRequest() {
     "use strict";
     var email, type, xhr;
     email = document.getElementById("usr_email");
-    if (email !== null && email.value === "") {
+    if (!email.checkValidity()) {
         document.getElementById("usr_login_error").innerHTML = "Invalid email";
         document.getElementById("usr_login_error").style.color = "red";
     } else {
@@ -44,6 +44,7 @@ function ajaxLoginRequest() {
         if (email === null && type === null) {
             xhr.send();
         } else {
+            document.getElementById("main_container").setAttribute("data-type",type.value);
             xhr.send('email=' + email.value + '&type=' + type.value);
         }
     }

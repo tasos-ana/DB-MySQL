@@ -11,7 +11,7 @@
         <div class="form-group">
             <!--EMAIL-->
             <label for="usr_email">Email:</label>
-            <input type="text" id="usr_email" name="email" 
+            <input type="email" id="usr_email" name="email" 
                    placeholder="Enter your email" 
                    autofocus required size="38"
                    onkeydown="enterPress('login', event)"><br>

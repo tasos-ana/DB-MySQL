@@ -104,6 +104,23 @@ function pagePrepare() {
     document.getElementById("main_container").style.display = "none";
 }
 
-function test(){
-    window.alert("sssss");
+function getAccountName() {
+    return document.getElementById("cardHolder").value;
 }
+
+function getAccountNumber() {
+    return document.getElementById("cardNumber").value;
+}
+
+function getAccountType() {
+    return document.getElementById("main_container").getAttribute("data-type");
+}
+
+function getAccountCardLimit() {
+    return document.getElementById("cardLimit").value;
+}
+
+function getAccountDebtValue() {
+    return document.getElementById("debtValue").value;
+}
+
