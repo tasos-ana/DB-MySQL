@@ -5,9 +5,13 @@
  */
 package servlets;
 
+import cs359db.db.CustomerDB;
+import cs359db.model.Customer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -42,9 +46,10 @@ public class CompanyServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
+     * @throws java.lang.ClassNotFoundException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, ClassNotFoundException {
         response.setContentType("text/html;charset=UTF-8");
 
         String action = request.getHeader("action");
@@ -95,7 +100,8 @@ public class CompanyServlet extends HttpServlet {
         }
     }
 
-    private void openAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void openAction(HttpServletRequest request, HttpServletResponse response) 
+            throws IOException, ServletException, ClassNotFoundException {
         String email = request.getParameter("email");
         String type = request.getParameter("type");
         if (missing(email)
@@ -107,6 +113,10 @@ public class CompanyServlet extends HttpServlet {
             Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies
             usrCookie.setMaxAge(3600);
             response.addCookie(usrCookie);
+
+            // add new account to database
+            // TODO switch for company and merchant
+            CustomerDB.addCustomer(new Customer(email));
 
             StringBuilder url = new StringBuilder();
             url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
@@ -158,7 +168,11 @@ public class CompanyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CompanyServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -172,7 +186,11 @@ public class CompanyServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CompanyServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

@@ -77,7 +77,7 @@ function ajaxOpenAccountRequest() {
         document.getElementById("loadingModal").style.display = "block";
 
         type = document.getElementById("user_account_type");
-        email = document.getElementById("usr_email");
+        email = document.getElementById("usrEMAIL");
         xhr.send('email=' + email.value + '&type=' + type.value);
     } else {
         document.getElementById("form_alert").removeAttribute("hidden");
