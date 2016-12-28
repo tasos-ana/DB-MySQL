@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package servlets;
 
-import cs359db.db.CustomerDB;
-import cs359db.model.Customer;
+import cs359db.db.dbAPI;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
@@ -100,7 +94,7 @@ public class CompanyServlet extends HttpServlet {
         }
     }
 
-    private void openAction(HttpServletRequest request, HttpServletResponse response) 
+    private void openAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException {
         String email = request.getParameter("email");
         String type = request.getParameter("type");
@@ -108,19 +102,21 @@ public class CompanyServlet extends HttpServlet {
                 || missing(type)) {
             response.setHeader("fail", "Missing Parameters");
         } else {
-            //TODO elegxo an to email uparxei h oxi
-            response.setHeader("id", "Welcome, " + email);
-            Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies
-            usrCookie.setMaxAge(3600);
-            response.addCookie(usrCookie);
+            if (dbAPI.validEmail(email)) {
+                response.setHeader("id", "Welcome, " + email);
+                Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies
+                usrCookie.setMaxAge(3600);
+                response.addCookie(usrCookie);
 
-            // add new account to database
-            // TODO switch for company and merchant
-            CustomerDB.addCustomer(new Customer(email));
+                // add new account to database
+                dbAPI.addEntity(type, email);
 
-            StringBuilder url = new StringBuilder();
-            url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
-            forwardToPage(request, response, url.toString());
+                StringBuilder url = new StringBuilder();
+                url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
+                forwardToPage(request, response, url.toString());
+            } else {
+                response.setHeader("error", "Email already exist");
+            }
         }
     }
 

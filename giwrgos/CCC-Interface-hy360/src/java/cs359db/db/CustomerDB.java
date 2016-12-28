@@ -18,11 +18,6 @@ import java.util.logging.Logger;
  */
 public class CustomerDB {
 
-    public static void openAccount(String email) {
-        
-
-    }
-
     /**
      * Get customer
      *
@@ -33,7 +28,7 @@ public class CustomerDB {
         List<Customer> customers = new ArrayList<>();
 
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 StringBuilder insQuery = new StringBuilder();
@@ -73,7 +68,7 @@ public class CustomerDB {
     public static Customer getCustomer(String email) throws ClassNotFoundException {
         Customer user = new Customer();
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 StringBuilder insQuery = new StringBuilder();
@@ -119,7 +114,7 @@ public class CustomerDB {
             Logger.getLogger(CustomerDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 Date date = new Date();
@@ -163,7 +158,7 @@ public class CustomerDB {
             Logger.getLogger(CustomerDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 StringBuilder insQuery = new StringBuilder();
@@ -195,7 +190,7 @@ public class CustomerDB {
     public static void deleteCustomer(Customer customer) throws ClassNotFoundException {
 
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 StringBuilder insQuery = new StringBuilder();
@@ -227,7 +222,7 @@ public class CustomerDB {
     public static void deleteCustomer(String email) throws ClassNotFoundException {
 
         try {
-            try (Connection con = CS360DB.getConnection();
+            try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
                 StringBuilder insQuery = new StringBuilder();
@@ -248,36 +243,5 @@ public class CustomerDB {
             // Log exception
             Logger.getLogger(CustomerDB.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public static boolean checkValidEmail(String email) throws ClassNotFoundException {
-        boolean valid = true;
-        try {
-            try (Connection con = CS360DB.getConnection();
-                    Statement stmt = con.createStatement()) {
-
-                StringBuilder insQuery = new StringBuilder();
-
-                insQuery.append("SELECT * FROM customer ")
-                        .append(" WHERE ")
-                        .append(" EMAIL = ").append("'").append(email).append("';");
-
-                stmt.execute(insQuery.toString());
-                if (stmt.getResultSet().next() == true) {
-                    System.out.println("#DB: The member alreadyExists");
-                    valid = false;
-                }
-
-                // Close connection
-                stmt.close();
-                con.close();
-            }
-
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(CustomerDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return valid;
     }
 }
