@@ -53,8 +53,9 @@ public class dbAPI {
         }
     }
 
-    public static boolean validEmail(String email) throws ClassNotFoundException {
-        boolean valid = true;
+    // FIXME tha elegxei olous tou pinakes gia to email
+    public static String checkEmail(String email) throws ClassNotFoundException {
+        String exists= "not exist";
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
@@ -68,7 +69,7 @@ public class dbAPI {
                 stmt.execute(insQuery.toString());
                 if (stmt.getResultSet().next() == true) {
                     System.out.println("#DB: The member alreadyExists");
-                    valid = false;
+                    exists = "customer";
                 }
 
                 // Close connection
@@ -81,7 +82,7 @@ public class dbAPI {
             Logger.getLogger(CustomerDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return valid;
+        return exists;
     }
 
 }

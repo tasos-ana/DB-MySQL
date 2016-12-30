@@ -69,7 +69,9 @@ public class CompanyServlet extends HttpServlet {
         }
     }
 
-    private void loginAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void loginAction(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException, ClassNotFoundException {
+
         String email = request.getParameter("email");
         String type = request.getParameter("type");
         if (email == null && type == null) {
@@ -82,27 +84,33 @@ public class CompanyServlet extends HttpServlet {
                 forwardToPage(request, response, url.toString());
             }
         } else {
-            //TODO Elegxos an me afto to email exei ginei register kapoio account
-            response.setHeader("id", "Hello, " + email);
-            Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies ,TODO rename addCookie
-            usrCookie.setMaxAge(3600);
-            response.addCookie(usrCookie);
+            String exists = dbAPI.checkEmail(email);
+            if (exists.equals("not exist")) {
+                // TODO ena error h fail header
+            } else {
+                response.setHeader("id", "Hello, " + email);
+                Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies ,TODO rename addCookie
+                usrCookie.setMaxAge(3600);
+                response.addCookie(usrCookie);
 
-            StringBuilder url = new StringBuilder();
-            url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
-            forwardToPage(request, response, url.toString());
+                StringBuilder url = new StringBuilder();
+                url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
+                forwardToPage(request, response, url.toString());
+            }
         }
     }
 
     private void openAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException {
+
         String email = request.getParameter("email");
         String type = request.getParameter("type");
         if (missing(email)
                 || missing(type)) {
             response.setHeader("fail", "Missing Parameters");
         } else {
-            if (dbAPI.validEmail(email)) {
+            String exists = dbAPI.checkEmail(email);
+            if (exists.equals("not exist")) {
                 response.setHeader("id", "Welcome, " + email);
                 Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email));//create and set cookies
                 usrCookie.setMaxAge(3600);
@@ -115,7 +123,7 @@ public class CompanyServlet extends HttpServlet {
                 url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
                 forwardToPage(request, response, url.toString());
             } else {
-                response.setHeader("error", "Email already exist");
+                response.setHeader("error", "Email already exist at: " + exists);
             }
         }
     }
