@@ -4,7 +4,16 @@
     Author     : Tasos
 --%>
 
+<%@page import="cs360db.model.Civilian"%>
+<%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    ServletContext context = getServletContext();
+
+    if (context.getAttribute("data") instanceof Civilian) {
+        Civilian user = (Civilian) context.getAttribute("data");
+        context.removeAttribute("data"); // clear after use
+%>
 <script>
     $(function () {
         $("#datepickerfrom").datepicker();
@@ -17,7 +26,8 @@
     <h2>Customer dashboard</h2>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#home" class="darkcolor">Home</a></li>
+        <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
+                              onclick="ajaxRefreshCivilian()">Home</a></li>
         <li><a data-toggle="tab" href="#buy" class="darkcolor">Buy</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
         <li><a data-toggle="tab" href="#refund" class="darkcolor">Refund</a></li>
@@ -37,17 +47,19 @@
                                 <th>Card holder</th>
                                 <th>Expired thru</th>
                                 <th>Credit limit</th>
+                                <th>Available credit balance </th>
                                 <th>Debt's</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="text-left">
                                 <td id="accountNo">1</td>
-                                <td id="cardNumber">1234 5678 9123 4567</td>
-                                <td id="cardHolder">Akakies Ta makaronia</td>
-                                <td id="cardExpired">2018</td>
-                                <td><span id="cardLimit">100,00</span> &#8364</td>
-                                <td><span id="debtValue">0,00</span> &#8364</td>
+                                <td id="cardNumber"> <%= user.getCard().getAccountNumber()%> </td>
+                                <td id="cardHolder"> <%= user.getName()%></td>
+                                <td id="cardExpired"><%= user.getCard().getValidThru()%></td>
+                                <td><span id="cardLimit"><%= user.getCard().getCreditLimit()%></span> &#8364</td>
+                                <td><span id="availableCreditBalance"><%= user.getCard().getAvailableCreditBalance()%></span> &#8364</td>
+                                <td><span id="debtValue"><%= user.getCard().getCurrentDebt()%></span> &#8364</td>
                             </tr>
                         </tbody>
                     </table>
@@ -115,3 +127,7 @@
         </div>
     </div>
 </div>
+<%  } else {
+        System.out.println("customerPage.jsp: attribute \"data\" should contain a 'Civilian' object");
+    }
+%>

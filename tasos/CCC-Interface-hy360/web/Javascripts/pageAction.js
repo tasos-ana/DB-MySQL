@@ -61,6 +61,10 @@ function openAccount_action() {
     renderPage();
 }
 
+function userPage_action(){
+    succeed_login_action();
+}
+
 function succeed_login_action() {
     document.getElementById("login_but").setAttribute("data-visible", "none");
     document.getElementById("open_account_but").setAttribute("data-visible", "none");

@@ -14,25 +14,20 @@ public class Cookies {
 
     private static Random rand = new Random(); // Seeded by current date/time
     private static HashMap<Integer, String> servletCookies = new HashMap<>();
-    private static HashMap<Integer, Integer> numOfImages = new HashMap<>();
-    private static HashMap<String, String> lastLogin = new HashMap<>();
+    private static HashMap<Integer, String> userType = new HashMap<>();
 
     public static int countCookies() {
         return servletCookies.size();
     }
 
-    public static int addCookie(String username) {
+    public static int addCookie(String username, String type) {
         int value = rand.nextInt();
 
         while (servletCookies.containsKey(value)) {
             value = rand.nextInt();
         }
         servletCookies.put(value, username);
-        numOfImages.put(value, 10);
-
-        // set Last login for user
-        Date currDate = new Date();
-        lastLogin.put(username, currDate.toGMTString());
+        userType.put(value, type);
 
         return value;
     }
@@ -44,7 +39,7 @@ public class Cookies {
 
         int key = Integer.parseInt(cookie);
         servletCookies.remove(key);
-        numOfImages.remove(key);
+        userType.remove(key);
     }
 
     public static String getCookieValue(String cookie) {
@@ -55,6 +50,16 @@ public class Cookies {
         int key = Integer.parseInt(cookie);
 
         return servletCookies.get(key);
+    }
+    
+    public static String getCookieType(String cookie) {
+        if (cookie == null) {
+            return null;
+        }
+
+        int key = Integer.parseInt(cookie);
+
+        return userType.get(key);
     }
 
     public static String getRequestCookieValue(HttpServletRequest request,
@@ -85,30 +90,4 @@ public class Cookies {
         }
         return null;
     }
-
-    public static void setNumOfImages(int cookie, int number) {
-        numOfImages.put(cookie, number);
-    }
-
-    public static int getNumOfImages(int cookie) {
-        return numOfImages.get(cookie);
-    }
-
-    public static String getLastLogin(String username) {
-        String last = null;
-
-        for (String user : servletCookies.values()) {
-            if (user.equals(username)) {
-                last = "Online";
-                break;
-            }
-        }
-
-        if (last == null) { // not online
-            last = lastLogin.get(username);
-        }
-
-        return last;
-    }
-
 }
