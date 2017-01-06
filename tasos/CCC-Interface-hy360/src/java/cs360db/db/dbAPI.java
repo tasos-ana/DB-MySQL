@@ -5,7 +5,7 @@
  */
 package cs360db.db;
 
-import cs360db.model.Civilian;
+import cs360db.model.User;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -42,47 +42,22 @@ public class dbAPI {
 
     public static void addEntity(String type, String email, String name)
             throws ClassNotFoundException, ParseException {
-        switch (type) {
-            case "customer":
-                CivilianDB.addCivilian(new Civilian(email, name));
-                break;
-            case "merchant":
-
-                break;
-            case "company":
-
-                break;
-            default:
-                assert (false);
-        }
-    }
-
-    public static Object getUser(String type, String email) throws ParseException, ClassNotFoundException {
-        switch (type) {
-            case "customer":
-                return CivilianDB.getCivilian(email);
-            case "merchant":
-                break;
-            case "company":
-                break;
-            default:
-                assert (false);
-        }
-        return null;
+        UserDB.addUser(new User(email, name, type));
     }
     
+    public static void addEntity(String type, String email, String name, String accountNumber)
+            throws ClassNotFoundException, ParseException {
+        User user = new User(email, name, type);
+        user.getCard().setAccountNumber(Integer.parseInt(accountNumber));
+        UserDB.addUser(user);
+    }
+
+    public static User getUser(String type, String email) throws ParseException, ClassNotFoundException {
+        return UserDB.getUser(email, type);
+    }
+
     public static boolean deleteUser(String type, String email) throws ParseException, ClassNotFoundException {
-        switch (type) {
-            case "customer":
-                CivilianDB.deleteCivilian(email);
-            case "merchant":
-                break;
-            case "company":
-                break;
-            default:
-                assert (false);
-        }
-        return false;
+        return UserDB.deleteUser(email);
     }
 
     public static boolean existID(String email) throws ClassNotFoundException {
@@ -91,31 +66,20 @@ public class dbAPI {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
-                exist = innerExistID(stmt, "civilian", email);
-                if (exist) {
-                    return exist;
+                //TODO na ginei 1 query gia ola ta table
+                if (innerExistID(stmt, "civilian", email)) {
+                    exist = true;
+                } else if (innerExistID(stmt, "company", email)) {
+                    exist = true;
+                } else if (innerExistID(stmt, "employee_civilian", email)) {
+                    exist = true;
+                } else if (innerExistID(stmt, "employee_merchant", email)) {
+                    exist = true;
+                } else if (innerExistID(stmt, "merchant", email)) {
+                    exist = true;
+                } else {
+                    exist = false;
                 }
-
-                exist = innerExistID(stmt, "company", email);
-                if (exist) {
-                    return exist;
-                }
-
-                exist = innerExistID(stmt, "employee_civilian", email);
-                if (exist) {
-                    return exist;
-                }
-
-                exist = innerExistID(stmt, "employee_merchant", email);
-                if (exist) {
-                    return exist;
-                }
-
-                exist = innerExistID(stmt, "merchant", email);
-                if (exist) {
-                    return exist;
-                }
-
                 // Close connection
                 stmt.close();
                 con.close();
@@ -123,7 +87,7 @@ public class dbAPI {
 
         } catch (SQLException ex) {
             // Log exception
-            Logger.getLogger(CivilianDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return exist;
@@ -134,40 +98,17 @@ public class dbAPI {
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
-
-                switch (type) {
-                    case "customer":
-                        exist = innerExistID(stmt, "civilian", email);
-                        if (exist) {
-                            return exist;
-                        }
-
-                        exist = innerExistID(stmt, "employee_civilian", email);
-                        if (exist) {
-                            return exist;
-                        }
-
-                        break;
-                    case "merchant":
-                        exist = innerExistID(stmt, "merchant", email);
-                        if (exist) {
-                            return exist;
-                        }
-
-                        exist = innerExistID(stmt, "employee_merchant", email);
-                        if (exist) {
-                            return exist;
-                        }
-                        break;
-                    case "company":
-                        exist = innerExistID(stmt, "company", email);
-                        if (exist) {
-                            return exist;
-                        }
-                        break;
-                    default:
-                        assert (false);
+                
+                StringBuilder insQuery = new StringBuilder();
+                insQuery.append("SELECT * FROM ").append(type)
+                        .append(" WHERE ")
+                        .append(" ID = ").append("'").append(email).append("';");
+                stmt.execute(insQuery.toString());
+                if (stmt.getResultSet().next() == true) {
+                    System.out.println("#DB: The member alreadyExists");
+                    exist = true;
                 }
+
                 // Close connection
                 stmt.close();
                 con.close();
@@ -175,13 +116,13 @@ public class dbAPI {
 
         } catch (SQLException ex) {
             // Log exception
-            Logger.getLogger(CivilianDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return exist;
     }
 
-    private static boolean innerExistID(Statement stmt, String table, String email) throws SQLException {
+    private static boolean innerExistID(Statement stmt, String table, String email) throws SQLException {//REMOVE ME 
         boolean exist = false;
         /*
                  * Search if email exist on civilian table

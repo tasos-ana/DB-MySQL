@@ -2,7 +2,7 @@
 
 function ajaxLoginRequest() {
     "use strict";
-    var email, type, xhr;
+    var email, type, xhr, works, newType;
     email = document.getElementById("usr_email");
 
     xhr = new XMLHttpRequest();
@@ -39,12 +39,22 @@ function ajaxLoginRequest() {
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader('action', 'login');
     type = document.getElementById("user_account_type");
+    works = document.getElementById("extraProperties");
     pagePrepare();
     if (email === null && type === null) {
         xhr.send();
     } else {
+        if (type.value !== "company") {
+            if (works.value === "yes") {
+                newType = "employee_" + type.value;
+            } else {
+                newType = type.value;
+            }
+        } else {
+            newType = type.value;
+        }
         document.getElementById("main_container").setAttribute("data-type", type.value);
-        xhr.send('email=' + email.value + '&type=' + type.value);
+        xhr.send('email=' + email.value + '&type=' + newType);
     }
 
 }
@@ -92,7 +102,6 @@ function ajaxCloseAccountRequest() {
     "use strict";
     var xhr, currentDebt;
     currentDebt = document.getElementById("debtValue").innerHTML;
-    window.alert(currentDebt);
     if (currentDebt !== '0.0') {
         window.alert("Can't delete your account while you have debt's to other people");
     } else {
@@ -103,9 +112,13 @@ function ajaxCloseAccountRequest() {
                 if (!cookieExist(xhr.getResponseHeader("fail"))) {
                     document.getElementById("home_but").click();
                 } else {
-                    window.alert("Your account close with succed!");
-                    document.getElementById("page_message").innerHTML = "Credit Card Company";
-                    logout_action();
+                    if (xhr.getResponseHeader("error") !== null) {
+                        window.alert(xhr.responseText);
+                    } else {
+                        window.alert("Your account close with succed!");
+                        document.getElementById("page_message").innerHTML = "Credit Card Company";
+                        logout_action();
+                    }
                 }
             } else if (xhr.status !== 200) {
                 window.alert("Request failed. Returned status of " + xhr.status);
@@ -141,35 +154,55 @@ function ajaxLogoutRequest() {
 }
 
 function ajaxEmployeeAction() {
-    var accountNumber, accountName, accountType, action;
+    if (validationAPI.form()) {
+        var accountNumber, accountID, accountName, accountType, action;
     accountNumber = document.employee.accountNumber;
+    accountID = document.employee.accountID;
     accountName = document.employee.accountName;
     accountType = document.employee.accountType;
     action = document.employee.action;
-    if (accountName.checkValidity()) {
-        var xhr;
-        xhr = new XMLHttpRequest();
-        xhr.open('POST', 'CompanyServlet');
-        xhr.onload = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                if (!cookieExist(xhr.getResponseHeader("fail"))) {
-                    document.getElementById("home_but").click();
+    var xhr;
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.responseText);
                 } else {
-                    //TODO
+                    window.alert("New Employee added successful");
+                    document.employee.reset();
+                    document.getElementById("usrNAME_err").innerHTML = "*";
+                    document.getElementById("usrNAME_err").style.color = "red";
+                    
+                    document.getElementById("usrEMAIL_err").innerHTML = "*";
+                    document.getElementById("usrEMAIL_err").style.color = "red";
                 }
-            } else if (xhr.status !== 200) {
-                window.alert("Request failed. Returned status of " + xhr.status);
             }
-        };
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.setRequestHeader('action', action.value);
-        xhr.send("accountNumber=" + accountNumber.value +
-                "&accountName=" + accountName.value +
-                "&accountType=" + accountType.value);
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action', action.value);
+    pagePrepare();
+    xhr.send("accountNumber=" + accountNumber.value +
+            "&accountID=" + accountID.value +
+            "&accountName=" + accountName.value +
+            "&accountType=" + accountType.value);
+    }else{
+        document.getElementById("form_alert").removeAttribute("hidden");
+        document.getElementById("form_alert").addEventListener("mouseover", setTimeout(function () {
+            document.getElementById("form_alert").setAttribute("hidden", "true");
+        }, 2000));
+        return;
     }
 }
 
-function ajaxRefreshCivilian() {
+function ajaxRefreshUser() {
     "use strict";
     var xhr;
     xhr = new XMLHttpRequest();
@@ -181,12 +214,20 @@ function ajaxRefreshCivilian() {
             } else {
                 var user;
                 user = JSON.parse(xhr.responseText);
-                document.getElementById("cardNumber").innerHTML = user.cardNumber;
-                document.getElementById("cardHolder").innerHTML = user.cardHolder;
-                document.getElementById("cardExpired").innerHTML = user.expiredThru;
-                document.getElementById("cardLimit").innerHTML = user.creditLimit;
-                document.getElementById("availableCreditBalance").innerHTML = user.availableCreditBalance;
-                document.getElementById("debtValue").innerHTML = user.currentDebt;
+                if (user.type === "merchant") {
+                    document.getElementById("cardNumber").innerHTML = user.cardNumber;
+                    document.getElementById("cardHolder").innerHTML = user.cardHolder;
+                    document.getElementById("totalProfit").innerHTML = user.totalProfit;
+                    document.getElementById("debtValue").innerHTML = user.debtToCCC;
+                    document.getElementById("supply").innerHTML = user.supply;
+                } else {
+                    document.getElementById("cardNumber").innerHTML = user.cardNumber;
+                    document.getElementById("cardHolder").innerHTML = user.cardHolder;
+                    document.getElementById("cardExpired").innerHTML = user.expiredThru;
+                    document.getElementById("cardLimit").innerHTML = user.creditLimit;
+                    document.getElementById("availableCreditBalance").innerHTML = user.availableCreditBalance;
+                    document.getElementById("debtValue").innerHTML = user.currentDebt;
+                }
             }
         } else if (xhr.status !== 200) {
             window.alert("Request failed. Returned status of " + xhr.status);

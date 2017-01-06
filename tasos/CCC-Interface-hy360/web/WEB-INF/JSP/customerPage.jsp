@@ -4,14 +4,14 @@
     Author     : Tasos
 --%>
 
-<%@page import="cs360db.model.Civilian"%>
+<%@page import="cs360db.model.User"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     ServletContext context = getServletContext();
 
-    if (context.getAttribute("data") instanceof Civilian) {
-        Civilian user = (Civilian) context.getAttribute("data");
+    if (context.getAttribute("data") instanceof User) {
+        User user = (User) context.getAttribute("data");
         context.removeAttribute("data"); // clear after use
 %>
 <script>
@@ -27,7 +27,7 @@
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
-                              onclick="ajaxRefreshCivilian()">Home</a></li>
+                              onclick="ajaxRefreshUser()">Home</a></li>
         <li><a data-toggle="tab" href="#buy" class="darkcolor">Buy</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
         <li><a data-toggle="tab" href="#refund" class="darkcolor">Refund</a></li>
@@ -68,7 +68,7 @@
         </div>
         <div id="buy" class="tab-pane fade">
             <form>
-                <fieldset class="fieldset-auto-width">
+                <fieldset>
                     <legend class="legend_text">Buy goods</legend>
                     <div class="title_text">Merchant:</div>
                     <input type="text" class="text-center" placeholder="Required" size="30" pattern="[a-zA-Z0-9]+"><br>
@@ -81,7 +81,7 @@
                 </fieldset>
             </form>
         </div>
-        <div id="debt" class="tab-pane fade in">
+        <div id="debt" class="tab-pane fade">
             <form>
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
@@ -99,7 +99,7 @@
         <div id="refund" class="tab-pane fade">
             <form>
                 <fieldset>
-                    <legend>Refund</legend>
+                    <legend class="legend_text">Refund</legend>
                     <div class="title_text">Merchant:</div>
                     <input type="text" class="text-center" placeholder="Required" size="30" pattern="[a-zA-Z0-9]+"><br>
                     <div class="title_text">Items Cost:</div>
@@ -115,9 +115,9 @@
             <form>
                 <!--TODO na mpei ena tab me diafora search-->
                 <fieldset>
-                    <legend>Based on Dates</legend>
-                    <div>Date from: <input type="text" id="datepickerfrom"></div>
-                    <div>Date before: <input type="text" id="datepickerbefore"></div><br>
+                    <legend class="legend_text">Based on Dates</legend>
+                    <span>Date from: <input type="text" id="datepickerfrom" size="11"></span>
+                    <span>Date before: <input type="text" id="datepickerbefore" size="11"></span><br>
                     <button type="button" class="btn btn-default btn_style"  
                             onclick="">
                         Search now
@@ -128,6 +128,6 @@
     </div>
 </div>
 <%  } else {
-        System.out.println("customerPage.jsp: attribute \"data\" should contain a 'Civilian' object");
+        System.out.println("customerPage.jsp: attribute \"data\" should contain a 'User' object");
     }
 %>

@@ -128,3 +128,17 @@ function getAccountDebtValue() {
     return document.getElementById("debtValue").value;
 }
 
+function updateMerchantDebt(){
+    var value;
+    value = document.getElementById("debtValue").innerHTML;
+    document.getElementById("debt_amount").value = value;
+}
+
+function extraProperties(){
+    var type = document.getElementById("user_account_type").value;
+    if(type === "company"){
+        document.getElementById("extraProperties").style.display = "none";
+    }else{
+        document.getElementById("extraProperties").style.display = "block";
+    }
+}

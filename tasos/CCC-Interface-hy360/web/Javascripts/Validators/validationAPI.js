@@ -65,7 +65,7 @@ var validationAPI = function () {
     function usrNAMEValidation() {
         var usrNAME, nameLen, letter;
 
-        usrNAME = document.registration.usrNAME;
+        usrNAME = document.getElementById("usrNAME");
         nameLen = usrNAME.value.length;
 
         letter = /[A-Za-z]/;

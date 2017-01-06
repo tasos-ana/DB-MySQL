@@ -30,7 +30,7 @@
         </div>
         <select id="user_account_type">
             <option value="company">Company</option>
-            <option value="customer">Customer</option>
+            <option value="civilian">Customer</option>
             <option value="merchant">Merchant</option>
         </select>
         <div id="form_alert" class="alert alert-danger" hidden>

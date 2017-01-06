@@ -15,11 +15,16 @@
                    placeholder="Enter your email" 
                    autofocus required size="38"
                    onkeydown="enterPress('login', event)"><br>
-            <select id="user_account_type">
+            <select id="user_account_type" onchange="extraProperties()">
                 <option value="company">Company</option>
-                <option value="customer">Customer</option>
+                <option value="civilian">Customer</option>
                 <option value="merchant">Merchant</option>
             </select>
+            <div id="extraProperties" class="row">
+                <div>Working on Company</div>
+                <input type="radio" name="worksAtCompanyPropertie" value="yes">Yes
+                <input type="radio" name="worksAtCompanyPropertie" value="no" checked="">No
+            </div>
             <div id="usr_login_error"></div>
         </div>
         <button id="login" type="button" onclick="ajaxLoginRequest()" class="btn btn-default btn_style">Login</button>

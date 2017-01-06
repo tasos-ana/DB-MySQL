@@ -38,6 +38,7 @@ public class CreditCard {
     }
 
     private void initCreditCard() throws ParseException {
+        System.out.println("cs360db.model.CreditCard.initCreditCard()");
         initAccountNumber();
         initValidThru();
         initCreditLimit();
@@ -50,27 +51,20 @@ public class CreditCard {
     }
 
     private void initValidThru() throws ParseException {
-        String MM, DD, YY, expiredDate;
+        String MM, YY ;
         Date date = new Date();
+        
         DateFormat df = new SimpleDateFormat("MM");
         MM = df.format(date);
-
-        df = new SimpleDateFormat("DD");
-        DD = df.format(date);
-
+        
         df = new SimpleDateFormat("YYYY");
         YY = df.format(date);
-        int newYY, newMM, newDD;
+        
+        int newYY, newMM;
         newYY = Integer.parseInt(YY);
         newMM = Integer.parseInt(MM);
-        newDD = Integer.parseInt(DD);
         newYY += 8;
 
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(DD).append("/").append(MM).append("/").append(newYY);
-//        expiredDate = sb.toString();
-//
-//        this.validThru = new Date(expiredDate);
         this.validThruMonth = newMM;
         this.validThruYear = newYY;
     }
@@ -92,10 +86,9 @@ public class CreditCard {
     }
 
     public String getValidThru() {
-        int YY, MM, DD;
+        int YY, MM;
         YY = this.validThruYear;
         MM = this.validThruMonth;
-        DD = 01;
         return MM + "/" + YY;
     }
 

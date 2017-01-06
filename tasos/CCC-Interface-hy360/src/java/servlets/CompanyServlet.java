@@ -1,7 +1,8 @@
 package servlets;
 
 import cs360db.db.dbAPI;
-import cs360db.model.Civilian;
+import cs360db.model.MerchantCreditCard;
+import cs360db.model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -72,6 +73,12 @@ public class CompanyServlet extends HttpServlet {
                 case "refresh":
                     refreshAction(request, response);
                     break;
+                case "addEmployee":
+                    addEmployeeAction(request, response);
+                    break;
+                case "removeEmployee":
+                    removeEmployeeAction(request, response);
+                    break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
             }
@@ -91,7 +98,7 @@ public class CompanyServlet extends HttpServlet {
             } else {
                 response.setHeader("id", "Hello, " + email);
                 StringBuilder url = new StringBuilder();
-                url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
+                url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
                 context.setAttribute("data", dbAPI.getUser(type, email));
                 context.setAttribute("dataType", type);
@@ -108,7 +115,7 @@ public class CompanyServlet extends HttpServlet {
                 response.addCookie(usrCookie);
 
                 StringBuilder url = new StringBuilder();
-                url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
+                url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
                 context.setAttribute("data", dbAPI.getUser(type, email));
                 context.setAttribute("dataType", type);
@@ -138,13 +145,13 @@ public class CompanyServlet extends HttpServlet {
                 dbAPI.addEntity(type, email, name);
 
                 StringBuilder url = new StringBuilder();
-                url.append("/WEB-INF/JSP/").append(type).append("Page.jsp");
+
+                url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
                 context.setAttribute("data", dbAPI.getUser(type, email));
-                context.setAttribute("dataType", type);
                 forwardToPage(request, response, url.toString());
             } else {
-                response.setHeader("error", "Email already exist at: " + exists);
+                response.setHeader("error", "Email already exists");
             }
         }
     }
@@ -152,8 +159,11 @@ public class CompanyServlet extends HttpServlet {
     private void closeAction(HttpServletRequest request, HttpServletResponse response) throws ParseException, ClassNotFoundException {
         String email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
         String type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
-        dbAPI.deleteUser(type, email);
-        logoutAction(request, response);
+        if (dbAPI.deleteUser(type, email)) {
+            logoutAction(request, response);
+        } else {
+            response.setHeader("error", "Something goes wrong please re-login and try again");
+        }
     }
 
     private void logoutAction(HttpServletRequest request, HttpServletResponse response) {
@@ -190,27 +200,64 @@ public class CompanyServlet extends HttpServlet {
         if (email == null && type == null) {
             response.setHeader("error", "we don't have cookie");
         } else {
-            switch (type) {
-                case "customer":
-                    Civilian user = (Civilian) dbAPI.getUser(type, email);
+            CharSequence str = "merchant";
+            User user = dbAPI.getUser(type, email);
+            if (type.contains(str)) {
+                if (user.getCard() instanceof MerchantCreditCard) {
+                    MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
                     try (PrintWriter out = response.getWriter()) { // construct JSON object
-                        out.append("{\"cardNumber\":\"").append("" + user.getCard().getAccountNumber()).append("\"");
+                        out.append("{\"cardNumber\":\"").append("" + cc.getAccountNumber()).append("\"");
                         out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
-                        out.append(",\"expiredThru\":\"").append(user.getCard().getValidThru()).append("\"");
-                        out.append(",\"creditLimit\":\"").append("" + user.getCard().getCreditLimit()).append("\"");
-                        out.append(",\"availableCreditBalance\":\"").append("" + user.getCard().getAvailableCreditBalance()).append("\"");
-                        out.append(",\"currentDebt\":\"").append("" + user.getCard().getCurrentDebt()).append("\"");
+                        out.append(",\"totalProfit\":\"").append("" + cc.getTotalProfit()).append("\"");
+                        out.append(",\"debtToCCC\":\"").append("" + cc.getCurrentDebt()).append("\"");
+                        out.append(",\"supply\":\"").append("" + cc.getSupply()).append("\"");
+                        out.append(",\"type\":\"").append("" + "merchant").append("\"");
                         out.append("}");
                     }
-                    break;
-                case "company":
-                    break;
-                case "merchant":
-                    break;
-                default:
+                } else {
                     assert (false);
+                }
+            } else {
+                try (PrintWriter out = response.getWriter()) { // construct JSON object
+                    out.append("{\"cardNumber\":\"").append("" + user.getCard().getAccountNumber()).append("\"");
+                    out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
+                    out.append(",\"expiredThru\":\"").append(user.getCard().getValidThru()).append("\"");
+                    out.append(",\"creditLimit\":\"").append("" + user.getCard().getCreditLimit()).append("\"");
+                    out.append(",\"availableCreditBalance\":\"").append("" + user.getCard().getAvailableCreditBalance()).append("\"");
+                    out.append(",\"currentDebt\":\"").append("" + user.getCard().getCurrentDebt()).append("\"");
+                    out.append(",\"type\":\"").append("customer").append("\"");
+                    out.append("}");
+                }
             }
         }
+    }
+
+    private void addEmployeeAction(HttpServletRequest request, HttpServletResponse response)
+            throws ClassNotFoundException, ParseException, IOException {
+        String email, name, accountNumber, type;
+        email = request.getParameter("accountID");
+        name = request.getParameter("accountName");
+        accountNumber = request.getParameter("accountNumber");
+        type = "employee_" + request.getParameter("accountType");
+        if (missing(email)
+                || missing(name)
+                || missing(accountNumber)
+                || missing(type)) {
+            response.setHeader("fail", "Missing Parameters");
+        } else {
+            boolean exists = dbAPI.existID(email);
+            if (!exists) {
+                // add new account to database
+                dbAPI.addEntity(type, email, name, accountNumber);
+            } else {
+                response.setHeader("error", "Email already exists");
+            }
+        }
+    }
+
+    private void removeEmployeeAction(HttpServletRequest request, HttpServletResponse response)
+            throws ClassNotFoundException, ParseException, IOException {
+
     }
 
     private void forwardToPage(HttpServletRequest request,
@@ -224,6 +271,27 @@ public class CompanyServlet extends HttpServlet {
 
     private boolean missing(String param) {
         return param == null || param.trim().isEmpty();
+    }
+
+    private String convertType2Page(String type) {
+        String str = "";
+        switch (type) {
+            case "civilian":
+            case "employee_civilian":
+                str = "customerPage.jsp";
+                break;
+            case "merchant":
+            case "employee_merchant":
+                str = "merchantPage.jsp";
+                break;
+            case "company":
+                str = "companyPage.jsp";
+                break;
+            default:
+                assert (false);
+        }
+
+        return str;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

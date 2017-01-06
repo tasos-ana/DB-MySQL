@@ -187,3 +187,7 @@ input:valid {
 .nav-tabs, .nav-pills {
     text-align:center;
 }
+
+#extraProperties{
+    display: none;
+}
