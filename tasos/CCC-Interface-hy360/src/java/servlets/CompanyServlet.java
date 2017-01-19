@@ -110,7 +110,7 @@ public class CompanyServlet extends HttpServlet {
                 response.setHeader("error", "User not exist!");//return error
             } else {
                 response.setHeader("id", "Hello, " + email);
-                Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email, type));//create and set cookies ,TODO rename addCookie
+                Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email, type));//create and set cookies
                 usrCookie.setMaxAge(3600);
                 response.addCookie(usrCookie);
 
@@ -130,8 +130,7 @@ public class CompanyServlet extends HttpServlet {
         String email = request.getParameter("email");
         String name = request.getParameter("name");
         String type = request.getParameter("type");
-        if (missing(email)
-                || missing(type)) {
+        if (missing(email) || missing(type) || missing(name)) {
             response.setHeader("fail", "Missing Parameters");
         } else {
             boolean exists = dbAPI.existID(email);
@@ -142,13 +141,14 @@ public class CompanyServlet extends HttpServlet {
                 response.addCookie(usrCookie);
 
                 // add new account to database
-                dbAPI.addEntity(type, email, name);
+                dbAPI.addEntity(email, name, type);
 
                 StringBuilder url = new StringBuilder();
 
                 url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
-                context.setAttribute("data", dbAPI.getUser(type, email));
+                //get from db the user an opportunity to check if user added correctly
+                context.setAttribute("data", dbAPI.getUser(email, type));
                 forwardToPage(request, response, url.toString());
             } else {
                 response.setHeader("error", "Email already exists");
@@ -159,11 +159,11 @@ public class CompanyServlet extends HttpServlet {
     private void closeAction(HttpServletRequest request, HttpServletResponse response) throws ParseException, ClassNotFoundException {
         String email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
         String type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
-        if (dbAPI.deleteUser(type, email)) {
-            logoutAction(request, response);
-        } else {
-            response.setHeader("error", "Something goes wrong please re-login and try again");
-        }
+//        if (dbAPI.deleteUser(type, email)) {
+//            logoutAction(request, response);
+//        } else {
+//            response.setHeader("error", "Something goes wrong please re-login and try again");
+//        }
     }
 
     private void logoutAction(HttpServletRequest request, HttpServletResponse response) {
@@ -193,43 +193,43 @@ public class CompanyServlet extends HttpServlet {
 
     private void refreshAction(HttpServletRequest request, HttpServletResponse response)
             throws ClassNotFoundException, ParseException, IOException {
-        String email, type;
-        email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
-        type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
-
-        if (email == null && type == null) {
-            response.setHeader("error", "we don't have cookie");
-        } else {
-            CharSequence str = "merchant";
-            User user = dbAPI.getUser(type, email);
-            if (type.contains(str)) {
-                if (user.getCard() instanceof MerchantCreditCard) {
-                    MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
-                    try (PrintWriter out = response.getWriter()) { // construct JSON object
-                        out.append("{\"cardNumber\":\"").append("" + cc.getAccountNumber()).append("\"");
-                        out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
-                        out.append(",\"totalProfit\":\"").append("" + cc.getTotalProfit()).append("\"");
-                        out.append(",\"debtToCCC\":\"").append("" + cc.getCurrentDebt()).append("\"");
-                        out.append(",\"supply\":\"").append("" + cc.getSupply()).append("\"");
-                        out.append(",\"type\":\"").append("" + "merchant").append("\"");
-                        out.append("}");
-                    }
-                } else {
-                    assert (false);
-                }
-            } else {
-                try (PrintWriter out = response.getWriter()) { // construct JSON object
-                    out.append("{\"cardNumber\":\"").append("" + user.getCard().getAccountNumber()).append("\"");
-                    out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
-                    out.append(",\"expiredThru\":\"").append(user.getCard().getValidThru()).append("\"");
-                    out.append(",\"creditLimit\":\"").append("" + user.getCard().getCreditLimit()).append("\"");
-                    out.append(",\"availableCreditBalance\":\"").append("" + user.getCard().getAvailableCreditBalance()).append("\"");
-                    out.append(",\"currentDebt\":\"").append("" + user.getCard().getCurrentDebt()).append("\"");
-                    out.append(",\"type\":\"").append("customer").append("\"");
-                    out.append("}");
-                }
-            }
-        }
+//        String email, type;
+//        email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
+//        type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
+//
+//        if (email == null && type == null) {
+//            response.setHeader("error", "we don't have cookie");
+//        } else {
+//            CharSequence str = "merchant";
+//            User user = dbAPI.getUser(type, email);
+//            if (type.contains(str)) {
+//                if (user.getCard() instanceof MerchantCreditCard) {
+//                    MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
+//                    try (PrintWriter out = response.getWriter()) { // construct JSON object
+//                        out.append("{\"cardNumber\":\"").append("" + cc.getAccountNumber()).append("\"");
+//                        out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
+//                        out.append(",\"totalProfit\":\"").append("" + cc.getTotalProfit()).append("\"");
+//                        out.append(",\"debtToCCC\":\"").append("" + cc.getCurrentDebt()).append("\"");
+//                        out.append(",\"supply\":\"").append("" + cc.getSupply()).append("\"");
+//                        out.append(",\"type\":\"").append("" + "merchant").append("\"");
+//                        out.append("}");
+//                    }
+//                } else {
+//                    assert (false);
+//                }
+//            } else {
+//                try (PrintWriter out = response.getWriter()) { // construct JSON object
+//                    out.append("{\"cardNumber\":\"").append("" + user.getCard().getAccountNumber()).append("\"");
+//                    out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
+//                    out.append(",\"expiredThru\":\"").append(user.getCard().getValidThru()).append("\"");
+//                    out.append(",\"creditLimit\":\"").append("" + user.getCard().getCreditLimit()).append("\"");
+//                    out.append(",\"availableCreditBalance\":\"").append("" + user.getCard().getAvailableCreditBalance()).append("\"");
+//                    out.append(",\"currentDebt\":\"").append("" + user.getCard().getCurrentDebt()).append("\"");
+//                    out.append(",\"type\":\"").append("customer").append("\"");
+//                    out.append("}");
+//                }
+//            }
+//        }
     }
 
     private void addEmployeeAction(HttpServletRequest request, HttpServletResponse response)

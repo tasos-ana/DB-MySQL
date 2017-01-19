@@ -40,70 +40,36 @@ public class dbAPI {
                 + "?zeroDateTimeBehavior=convertToNull&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", UNAME, PASSWD);
     }
 
-    public static void addEntity(String type, String email, String name)
+    //company, merchant, civilian
+    public static void addEntity(String email, String name, String type)
             throws ClassNotFoundException, ParseException {
         UserDB.addUser(new User(email, name, type));
     }
-    
-    public static void addEntity(String type, String email, String name, String accountNumber)
+
+    //employee in { merchant, civilian }
+    public static void addEntity(String email, String name, String type, String companyID)
             throws ClassNotFoundException, ParseException {
         User user = new User(email, name, type);
-        user.getCard().setAccountNumber(Integer.parseInt(accountNumber));
-        UserDB.addUser(user);
+        UserDB.addUser(user, companyID);
     }
 
-    public static User getUser(String type, String email) throws ParseException, ClassNotFoundException {
+    public static User getUser(String email, String type) throws ParseException, ClassNotFoundException {
         return UserDB.getUser(email, type);
     }
 
-    public static boolean deleteUser(String type, String email) throws ParseException, ClassNotFoundException {
-        return UserDB.deleteUser(email);
-    }
-
+//    public static boolean deleteUser(String type, String email) throws ParseException, ClassNotFoundException {
+//        return UserDB.deleteUser(email);
+//    }
+    
+    //done
     public static boolean existID(String email) throws ClassNotFoundException {
         boolean exist = false;
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
-                //TODO na ginei 1 query gia ola ta table
-                if (innerExistID(stmt, "civilian", email)) {
-                    exist = true;
-                } else if (innerExistID(stmt, "company", email)) {
-                    exist = true;
-                } else if (innerExistID(stmt, "employee_civilian", email)) {
-                    exist = true;
-                } else if (innerExistID(stmt, "employee_merchant", email)) {
-                    exist = true;
-                } else if (innerExistID(stmt, "merchant", email)) {
-                    exist = true;
-                } else {
-                    exist = false;
-                }
-                // Close connection
-                stmt.close();
-                con.close();
-            }
+                stmt.execute(Queries.exists(email));
 
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return exist;
-    }
-
-    public static boolean existID(String email, String type) throws ClassNotFoundException {
-        boolean exist = false;
-        try {
-            try (Connection con = dbAPI.getConnection();
-                    Statement stmt = con.createStatement()) {
-                
-                StringBuilder insQuery = new StringBuilder();
-                insQuery.append("SELECT * FROM ").append(type)
-                        .append(" WHERE ")
-                        .append(" ID = ").append("'").append(email).append("';");
-                stmt.execute(insQuery.toString());
                 if (stmt.getResultSet().next() == true) {
                     System.out.println("#DB: The member alreadyExists");
                     exist = true;
@@ -121,22 +87,31 @@ public class dbAPI {
 
         return exist;
     }
-
-    private static boolean innerExistID(Statement stmt, String table, String email) throws SQLException {//REMOVE ME 
+    
+    //done
+    public static boolean existID(String email, String table) throws ClassNotFoundException {
         boolean exist = false;
-        /*
-                 * Search if email exist on civilian table
-         */
-        StringBuilder insQuery = new StringBuilder();
-        insQuery.append("SELECT * FROM ").append(table)
-                .append(" WHERE ")
-                .append(" ID = ").append("'").append(email).append("';");
-        stmt.execute(insQuery.toString());
-        if (stmt.getResultSet().next() == true) {
-            System.out.println("#DB: The member alreadyExists");
-            exist = true;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+
+                stmt.execute(Queries.exists(email, table));
+                
+                if (stmt.getResultSet().next() == true) {
+                    System.out.println("#DB: The member alreadyExists");
+                    exist = true;
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return exist;
     }
-
 }

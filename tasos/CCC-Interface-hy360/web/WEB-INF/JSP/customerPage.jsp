@@ -4,15 +4,42 @@
     Author     : Tasos
 --%>
 
+<%@page import="cs360db.model.Civilian"%>
+<%@page import="cs360db.model.Company"%>
 <%@page import="cs360db.model.User"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     ServletContext context = getServletContext();
+    assert (context.getAttribute("data") instanceof User);
+    User user = (User) context.getAttribute("data");
+    context.removeAttribute("data"); // clear after use
+    String name, companyId, companyName, validThru;
+    double debt, creditBalance, creditLimit;
+    int accountNumber;
 
-    if (context.getAttribute("data") instanceof User) {
-        User user = (User) context.getAttribute("data");
-        context.removeAttribute("data"); // clear after use
+    name = user.getCivilian().getName();
+    if (user.isCivilian()) {
+        Civilian c = user.getCivilian();
+
+        companyId = null;
+        companyName = null;
+        debt = c.getDebt();
+        creditBalance = c.getCreditBalance();
+        creditLimit = c.getCreditLimit();
+        accountNumber = c.getAccountNumber();
+        validThru = c.getValidThru().toString();
+    } else {
+        Company c = user.getCompany();
+
+        companyId = c.getId();
+        companyName = c.getName();
+        debt = c.getDebt();
+        creditBalance = c.getCreditBalance();
+        creditLimit = c.getCreditLimit();
+        accountNumber = c.getAccountNumber();
+        validThru = c.getValidThru().toString();
+    }
 %>
 <script>
     $(function () {
@@ -43,23 +70,31 @@
                         <thead>
                             <tr class="text-left">
                                 <th>#</th>
+                                    <%if (companyId != null) {%>            
+                                <th>Company name</th>
+                                <th>Company ID</th>
+                                    <%}%>
                                 <th>Card number</th>
                                 <th>Card holder</th>
-                                <th>Expired thru</th>
+                                <th>Valid Thru</th>
                                 <th>Credit limit</th>
                                 <th>Available credit balance </th>
-                                <th>Debt's</th>
+                                <th>Debt</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="text-left">
                                 <td id="accountNo">1</td>
-                                <td id="cardNumber"> <%= user.getCard().getAccountNumber()%> </td>
-                                <td id="cardHolder"> <%= user.getName()%></td>
-                                <td id="cardExpired"><%= user.getCard().getValidThru()%></td>
-                                <td><span id="cardLimit"><%= user.getCard().getCreditLimit()%></span> &#8364</td>
-                                <td><span id="availableCreditBalance"><%= user.getCard().getAvailableCreditBalance()%></span> &#8364</td>
-                                <td><span id="debtValue"><%= user.getCard().getCurrentDebt()%></span> &#8364</td>
+                                <%if (companyId != null) {%>            
+                                <td id="companyName"><%= companyName%></td>
+                                <td id="companyId"><%= companyId%></td>
+                                <%}%>
+                                <td id="cardNumber"> <%= accountNumber%> </td>
+                                <td id="cardHolder"> <%= name%></td>
+                                <td id="cardExpired"><%= validThru%></td>
+                                <td><span id="cardLimit"><%= creditLimit%></span> &#8364</td>
+                                <td><span id="availableCreditBalance"><%= creditBalance%></span> &#8364</td>
+                                <td><span id="debtValue"><%= debt%></span> &#8364</td>
                             </tr>
                         </tbody>
                     </table>
@@ -127,7 +162,3 @@
         </div>
     </div>
 </div>
-<%  } else {
-        System.out.println("customerPage.jsp: attribute \"data\" should contain a 'User' object");
-    }
-%>

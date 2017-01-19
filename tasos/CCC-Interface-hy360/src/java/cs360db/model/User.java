@@ -1,173 +1,104 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cs360db.model;
-
-import java.io.Serializable;
-import java.text.ParseException;
 
 /**
  *
- * @author Tasos
+ * @author Tasos198
  */
-public class User implements Serializable {
+public class User {
 
-    private enum accountTypes {
-        CIVILIAN,
-        E_CIVILIAN,
-        MERCHANT,
-        E_MERCHANT,
-        COMPANY,
-        UNKNOWN
-    };
+    private Civilian civilian = null;
+    private Merchant merchant = null;
+    private Company company = null;
 
-    private String email; // (unique)
-    private String name;
-    private CreditCard card;
-    private accountTypes type;
-
-    public User(String type) throws ParseException {
-        this.email = "";
-        this.name = "";
-        initCard(type, false);
-        this.type = convertString2Type(type);
-    }
-
-    public User(String email, String type) throws ParseException {
-        this.email = email;
-        this.name = "";
-        initCard(type, true);
-        this.type = convertString2Type(type);
-    }
-
-    public User(String email, String name, String type) throws ParseException {
-        this.email = email;
-        this.name = name;
-        initCard(type, true);
-        this.type = convertString2Type(type);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return convertType2String(this.type);
-    }
-
-    public void setType(String type) {
-        this.type = convertString2Type(type);
-    }
-
-    public CreditCard getCard() {
-        return card;
-    }
-
-    public accountTypes convertString2Type(String type) {
-        switch (type) {
-            case "civilian":
-                return accountTypes.CIVILIAN;
-            case "employee_civilian":
-                return accountTypes.E_CIVILIAN;
-            case "merchant":
-                return accountTypes.MERCHANT;
-            case "employee_merchant":
-                return accountTypes.E_MERCHANT;
-            case "company":
-                return accountTypes.COMPANY;
-            default:
-                assert (false);
-        }
-        return null;
-    }
-
-    public String convertType2String(accountTypes type) {
-        if (type == accountTypes.CIVILIAN) {
-            return "civilian";
-        }
-
-        if (type == accountTypes.E_CIVILIAN) {
-            return "employee_civilian";
-        }
-
-        if (type == accountTypes.MERCHANT) {
-            return "merchant";
-        }
-
-        if (type == accountTypes.E_MERCHANT) {
-            return "employee_merchant";
-        }
-
-        if (type == accountTypes.COMPANY) {
-            return "company";
-        }
-
-        return null;
-    }
-    
-    private void initCard(String type, boolean create) throws ParseException{
-        switch (type) {
-            case "merchant":
-            case "employee_merchant":
-                this.card = new MerchantCreditCard(create);
-                break;
-            case "civilian":
-            case "employee_civilian":
-            case "company":
-                this.card = new CreditCard(create);
-                break;
-            default:
-                assert (false);
+    public User(String id, String name, String type) {
+        if (type.contains("civilian")) {
+            civilian = new Civilian(id, name, type);
+        } else if (type.contains("merchant")) {
+            merchant = new Merchant(id, name, type);
+        } else {
+            company = new Company(id, name);
         }
     }
 
-    /**
-     * Method that checks that all mandatory fields are set
-     *
-     * @throws Exception
-     */
-    public void checkFields() throws Exception {
-        // Check that everything is ok
-        if ((email == null || email.trim().isEmpty())) {
-            throw new Exception("Missing fields! (email)");  // Something went wrong with the fields
-        }
-        if ((name == null || name.trim().isEmpty())) {
-            throw new Exception("Missing fields! (name)");  // Something went wrong with the fields
-        }
-        if (card == null) {
-            throw new Exception("Missing fields! (card)");  // Something went wrong with the fields
-        }
-        if (type == accountTypes.UNKNOWN) {
-            throw new Exception("Missing fields! (type)");  // Something went wrong with the fields
-        }
+    public User(Civilian civilian) {
+        this.civilian = civilian;
     }
-    
-    /**
-     * Returns a string representation of this object
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Email: ").append(this.email).append("\n");
-        sb.append("Name: ").append(this.name).append("\n");
-        sb.append("Card details: ").append(this.card.toString()).append("\n");
-        sb.append("Type: ").append(this.type).append("\n");
-        return sb.toString();
+
+    public User(Merchant merchant) {
+        this.merchant = merchant;
+    }
+
+    public User(Company company) {
+        this.company = company;
+    }
+
+    public User(Merchant merchant, Company company) {
+        this.merchant = merchant;
+        this.company = company;
+    }
+
+    public User(Civilian civilian, Company company) {
+        this.civilian = civilian;
+        this.company = company;
+    }
+
+    public boolean isEmployeeMerchant() {
+        return company != null && merchant != null;
+    }
+
+    public boolean isEmployeeCivilian() {
+        return company != null && civilian != null;
+    }
+
+    public boolean isCompany() {
+        return company != null && merchant == null && civilian == null;
+    }
+
+    public boolean isMerchant() {
+        return company == null && merchant != null && civilian == null;
+    }
+
+    public boolean isCivilian() {
+        return company == null && merchant == null && civilian != null;
+    }
+
+    public Company getCompany() {
+        return this.company;
+    }
+
+    public Civilian getCivilian() {
+        assert (isCivilian());
+        return civilian;
+    }
+
+    public Merchant getMerchant() {
+        assert (isMerchant());
+        return merchant;
+    }
+
+    public Civilian getEmployeeCivilian() {
+        assert (isEmployeeCivilian());
+        return this.civilian;
+    }
+
+    public Merchant getEmployeeMerchant() {
+        assert (isEmployeeMerchant());
+        return this.merchant;
+    }
+
+    public boolean checkFields() {
+        return isCivilian() || isCompany() || isEmployeeCivilian()
+                || isEmployeeMerchant() || isMerchant();
+    }
+
+    public boolean isValidEmployee() {
+        assert (isCivilian() || isMerchant());
+        boolean state;
+        if (isCivilian()) {
+            state = civilian.isValidEmployee();
+        } else {
+            state = merchant.isValidEmployee();
+        }
+        return state;
     }
 }

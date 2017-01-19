@@ -1,89 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cs360db.db;
 
-import cs360db.model.MerchantCreditCard;
+import cs360db.model.Civilian;
+import cs360db.model.Company;
+import cs360db.model.Merchant;
 import cs360db.model.User;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Tasos
- */
 class UserDB {
-
-    /**
-     * Get Civilian
-     *
-     * @param type
-     * @return
-     * @throws ClassNotFoundException
-     * @throws java.text.ParseException
-     */
-    protected static List<User> getUsers(String type) throws ClassNotFoundException, ParseException {
-
-        List<User> users = new ArrayList<>();
-
-        try {
-            try (Connection con = dbAPI.getConnection();
-                    Statement stmt = con.createStatement()) {
-
-                StringBuilder insQuery = new StringBuilder();
-
-                insQuery.append("SELECT * FROM ").append(type).append(";");
-
-                stmt.execute(insQuery.toString());
-
-                ResultSet res = stmt.getResultSet();
-
-                while (res.next() == true) {
-                    User user = new User(type);
-                    user.setEmail(res.getString("ID"));
-                    user.setName(res.getString("Name"));
-                    user.setType(type);
-                    user.getCard().setAccountNumber(res.getInt("Account_number"));
-                    CharSequence str = "merchant";
-                    if (type.contains(str)) {//it's merchant or employee_merchant
-                        if (user.getCard() instanceof MerchantCreditCard) {
-                            MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
-                            cc.setCurrentDebt(res.getDouble("Debt_to_ccc"));
-                            cc.setSupply(res.getFloat("Supply"));
-                            cc.setTotalProfit(res.getDouble("Total_profit"));
-                        } else {
-                            assert (false);
-                        }
-                    } else {//it's company or civilian
-                        user.getCard().setAvailableCreditBalance(res.getDouble("Available_credit_balance"));
-                        user.getCard().setCreditLimit(res.getDouble("Credit_limit"));
-                        user.getCard().setCurrentDebt(res.getDouble("Cuurent_debt"));
-                        user.getCard().setValidThru(res.getString("Valid_thru"));
-                    }
-                    users.add(user);
-                }
-
-                // Close connection
-                stmt.close();
-                con.close();
-            }
-
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return users;
-    }
 
     /**
      * Get user
@@ -94,41 +25,20 @@ class UserDB {
      * @throws ClassNotFoundException
      * @throws java.text.ParseException
      */
-    protected static User getUser(String email, String type) throws ClassNotFoundException, ParseException {
-        User user = new User(type);
+    protected static User getUser(String email, String type)
+            throws ClassNotFoundException, ParseException {
+        User user = null;
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
-                StringBuilder insQuery = new StringBuilder();
-
-                insQuery.append("SELECT * FROM ").append(type).append(";");
-
-                stmt.execute(insQuery.toString());
-
+                String insQuery = Queries.getUser(type, email);
+                stmt.execute(insQuery);
                 ResultSet res = stmt.getResultSet();
-
+                
                 if (res.next() == true) {
-                    user.setEmail(res.getString("ID"));
-                    user.setName(res.getString("Name"));
-                    user.setType(type);
-                    user.getCard().setAccountNumber(res.getInt("Account_number"));
-                    CharSequence str = "merchant";
-                    if (type.contains(str)) {//it's merchant or employee_merchant
-                        if (user.getCard() instanceof MerchantCreditCard) {
-                            MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
-                            cc.setCurrentDebt(res.getDouble("Debt_to_ccc"));
-                            cc.setSupply(res.getFloat("Supply"));
-                            cc.setTotalProfit(res.getDouble("Total_profit"));
-                        } else {
-                            assert (false);
-                        }
-                    } else {//it's company or civilian
-                        user.getCard().setAvailableCreditBalance(res.getDouble("Available_credit_balance"));
-                        user.getCard().setCreditLimit(res.getDouble("Credit_limit"));
-                        user.getCard().setCurrentDebt(res.getDouble("Current_debt"));
-                        user.getCard().setValidThru(res.getString("Valid_thru"));
-                    }
+                    System.out.println(res.getString(1));
+                    user = exportUser(res, type);
                 }
 
                 // Close connection
@@ -146,271 +56,193 @@ class UserDB {
 
     /**
      * Establish a database connection and add the member in the database.
+     * member can be company,civilian or merchant
      *
      * @param user
      * @throws ClassNotFoundException
      */
     protected static void addUser(User user) throws ClassNotFoundException {
+        assert (user.isCivilian() || user.isCompany() || user.isMerchant());
         // Check that we have all we need
         try {
-            user.checkFields();
-
-        } catch (Exception ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
+                String table, insQuery;
+                if (user.isCivilian()) {
+                    Civilian u = user.getCivilian();
+                    table = "civilian";
+                    insQuery = Queries.insertCivilian(table, u.getName(), u.getAccountNumber(),
+                            u.getValidThru(), u.getId());
 
-                StringBuilder insQuery = new StringBuilder();
+                } else if (user.isCompany()) {
+                    Company u = user.getCompany();
+                    table = "company";
+                    insQuery = Queries.insertCompany(table, u.getName(), u.getAccountNumber(),
+                            u.getValidThru(), u.getId());
 
-                CharSequence str = "merchant";
-                String table = user.getType();
-                if (table.contains(str)) {//if it's merchant or employee merchant
-                    MerchantCreditCard card;
-                    if (user.getCard() instanceof MerchantCreditCard) {
-                        card = (MerchantCreditCard) user.getCard();
-                    } else {
-                        card = null;
-                        assert (false);
-                    }
-
-                    insQuery.append("INSERT INTO ")
-                            .append(table).append(" (ID, NAME, ACCOUNT_NUMBER, TOTAL_PROFIT, DEBT_TO_CCC, SUPPLY)")
-                            .append(" VALUES (")
-                            .append("'").append(user.getEmail()).append("',")
-                            .append("'").append(user.getName()).append("',")
-                            .append("'").append(card.getAccountNumber()).append("',")
-                            .append("'").append(card.getTotalProfit()).append("',")
-                            .append("'").append(card.getCurrentDebt()).append("',")
-                            .append("'").append(card.getSupply()).append("');");
-                } else {//otherwise the rest table's
-                    insQuery.append("INSERT INTO ")
-                            .append(table).append(" (ID, NAME, ACCOUNT_NUMBER, VALID_THRU,CREDIT_LIMIT, CURRENT_DEBT, AVAILABLE_CREDIT_BALANCE)")
-                            .append(" VALUES (")
-                            .append("'").append(user.getEmail()).append("',")
-                            .append("'").append(user.getName()).append("',")
-                            .append("'").append(user.getCard().getAccountNumber()).append("',")
-                            .append("'").append(user.getCard().getValidThru()).append("',")
-                            .append("'").append(user.getCard().getCreditLimit()).append("',")
-                            .append("'").append(user.getCard().getCurrentDebt()).append("',")
-                            .append("'").append(user.getCard().getAvailableCreditBalance()).append("');");
-                }
-                stmt.executeUpdate(insQuery.toString());
-                System.out.println("#DB: The user was successfully added in the database.");
-
-                // Close connection
-                stmt.close();
-                con.close();
-
-            }
-
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    /**
-     * Updates information for specific user
-     *
-     * @param user
-     * @throws ClassNotFoundException
-     */
-    protected static void updateUser(User user) throws ClassNotFoundException {
-        // Check that we have all we need
-        try {
-            user.checkFields();
-        } catch (Exception ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            try (Connection con = dbAPI.getConnection();
-                    Statement stmt = con.createStatement()) {
-
-                StringBuilder insQuery = new StringBuilder();
-
-                CharSequence str = "merchant";
-                String table = user.getType();
-                if (table.contains(str)) {//if it's merchant or employee merchant
-                    MerchantCreditCard card;
-                    if (user.getCard() instanceof MerchantCreditCard) {
-                        card = (MerchantCreditCard) user.getCard();
-                    } else {
-                        card = null;
-                        assert (false);
-                    }
-                    insQuery.append("UPDATE ").append(table)
-                            .append(" SET ")
-                            .append(" NAME = ").append("'").append(user.getName()).append("',")
-                            .append(" ACCOUNT_NUMBER = ").append("'").append(card.getAccountNumber()).append("',")
-                            .append(" TOTAL_PROFIT = ").append("'").append(card.getTotalProfit()).append("',")
-                            .append(" DEBT_TO_CCC = ").append("'").append(card.getCurrentDebt()).append("',")
-                            .append(" SUPPLY = ").append("'").append(card.getSupply()).append("',")
-                            .append(" WHERE ID = ").append("'").append(user.getEmail()).append("';");
-                } else {//otherwise the rest table's
-                    insQuery.append("UPDATE ").append(table)
-                            .append(" SET ")
-                            .append(" NAME = ").append("'").append(user.getName()).append("',")
-                            .append(" ACCOUNT_NUMBER = ").append("'").append(user.getCard().getAccountNumber()).append("',")
-                            .append(" VALID_THRU = ").append("'").append(user.getCard().getValidThru()).append("',")
-                            .append(" CREDIT_LIMIT = ").append("'").append(user.getCard().getCreditLimit()).append("',")
-                            .append(" CURRENT_DEBT = ").append("'").append(user.getCard().getCurrentDebt()).append("',")
-                            .append(" AVAILABLE_CREDIT_BALANCE = ").append("'").append(user.getCard().getAvailableCreditBalance()).append("',")
-                            .append(" WHERE ID = ").append("'").append(user.getEmail()).append("';");
-                }
-
-                stmt.executeUpdate(insQuery.toString());
-                System.out.println("#DB: The user was successfully updated in the database.");
-
-                // Close connection
-                stmt.close();
-                con.close();
-            }
-
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    /**
-     * Delete information for specific user
-     *
-     * @param user
-     * @throws ClassNotFoundException
-     */
-    protected static void deleteUser(User user) throws ClassNotFoundException {
-        try {
-            try (Connection con = dbAPI.getConnection();
-                    Statement stmt = con.createStatement()) {
-
-                StringBuilder insQuery = new StringBuilder();
-
-                String table = user.getType();
-
-                insQuery.append("DELETE FROM ").append(table)
-                        .append(" WHERE ")
-                        .append(" ID = ").append("'").append(user.getEmail()).append("';");
-
-                stmt.executeUpdate(insQuery.toString());
-                System.out.println("#DB: The user was successfully deleted from the database.");
-
-                // Close connection
-                stmt.close();
-                con.close();
-            }
-        } catch (SQLException ex) {
-            // Log exception
-            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    /**
-     * Delete information for specific user
-     *
-     * @param email
-     * @throws ClassNotFoundException
-     */
-    protected static boolean deleteUser(String email) throws ClassNotFoundException {
-        boolean exist = false;
-        try {
-            try (Connection con = dbAPI.getConnection();
-                    Statement stmt = con.createStatement()) {
-
-                if (innerExistID(stmt, "civilian", email)) {
-                    innerDeleteUser(stmt, "civilian", email);
-                    exist = true;
-                } else if (innerExistID(stmt, "company", email)) {
-                    innerDeleteUser(stmt, "company", email);
-                    exist = true;
-                } else if (innerExistID(stmt, "employee_civilian", email)) {
-                    innerDeleteUser(stmt, "employee_civilian", email);
-                    exist = true;
-                } else if (innerExistID(stmt, "employee_merchant", email)) {
-                    innerDeleteUser(stmt, "employee_merchant", email);
-                    exist = true;
-                } else if (innerExistID(stmt, "merchant", email)) {
-                    innerDeleteUser(stmt, "merchant", email);
-                    exist = true;
                 } else {
-                    exist = false;
+                    Merchant u = user.getMerchant();
+                    table = "merchant";
+                    insQuery = Queries.insertMerchant(table, u.getName(), u.getAccountNumber(), u.getId());
                 }
+                stmt.executeUpdate(insQuery);
+                System.out.println("#DB: The user was successfully added in [ " + table + " ] of the database.");
+
                 // Close connection
                 stmt.close();
                 con.close();
             }
-
         } catch (SQLException ex) {
             // Log exception
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return exist;
     }
 
-    private static void innerDeleteUser(Statement stmt, String table, String email) throws SQLException {
-        StringBuilder insQuery = new StringBuilder();
-
-        insQuery.append("DELETE FROM ").append(table)
-                .append(" WHERE ")
-                .append(" ID = ").append("'").append(email).append("';");
-
-        stmt.executeUpdate(insQuery.toString());
-        System.out.println("#DB: The civilian was successfully deleted from the database.");
-    }
-
-    protected static boolean existID(String email) throws ClassNotFoundException {
-        boolean exist = false;
+    /**
+     * Establish a database connection and add the member in the database.
+     * member can be company,civilian or merchant
+     *
+     * @param user
+     * @throws ClassNotFoundException
+     */
+    protected static void addUser(User user, String companyId) throws ClassNotFoundException {
+        assert ((user.isCivilian() || user.isMerchant()) && user.isValidEmployee());
+        // Check that we have all we need
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
-                if (innerExistID(stmt, "civilian", email)) {
-                    exist = true;
-                }else if(innerExistID(stmt, "company", email)){
-                    exist = true;
-                }else if(innerExistID(stmt, "company", email)){
-                    exist = true;
-                }else if(innerExistID(stmt, "employee_civilian", email)){
-                    exist = true;
-                }else if(innerExistID(stmt, "employee_merchant", email)){
-                    exist = true;
-                }else if(innerExistID(stmt, "merchant", email)){
-                    exist = true;
-                }else{
-                    exist = false;
+                String table, insQuery;
+                if (user.isCivilian()) {
+                    Civilian u = user.getCivilian();
+                    table = "employee_civilian";
+                    insQuery = Queries.insertECivilian(table, u.getName(),
+                            u.getId(), companyId);
+                } else {
+                    Merchant u = user.getMerchant();
+                    table = "employee_civilian";
+                    insQuery = Queries.insertEMerchant(table, u.getName(),
+                            u.getId(), companyId, u.getTotalProfit(), u.getCommission());
                 }
+                stmt.executeUpdate(insQuery);
+                System.out.println("#DB: The user was successfully added in [ " + table + " ] of the database.");
                 // Close connection
                 stmt.close();
                 con.close();
             }
-
         } catch (SQLException ex) {
             // Log exception
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return exist;
     }
 
-    private static boolean innerExistID(Statement stmt, String table, String email) throws SQLException {
-        boolean exist = false;
-        /*
-                 * Search if email exist on civilian table
-         */
-        StringBuilder insQuery = new StringBuilder();
-        insQuery.append("SELECT * FROM ").append(table)
-                .append(" WHERE ")
-                .append(" ID = ").append("'").append(email).append("';");
-
-        stmt.execute(insQuery.toString());
-        if (stmt.getResultSet().next() == true) {
-            System.out.println("#DB: The member alreadyExists");
-            exist = true;
+    private static User exportUser(ResultSet res, String type)
+            throws SQLException, ParseException {
+        User u = null;
+        switch (type) {
+            case "civilian":
+                u = exportCivilian(res);
+                break;
+            case "merchant":
+                u = exportMerchant(res);
+                break;
+            case "company":
+                u = exportCompany(res);
+                break;
+            case "employee_civilian":
+                u = exportECivilian(res);
+                break;
+            case "employee_merchant":
+                u = exportEMerchant(res);
+                break;
+            default:
+                assert (false);
         }
-        return exist;
+        return u;
     }
 
+    private static User exportCivilian(ResultSet res) throws SQLException, ParseException {
+        String name = res.getString("Name");
+        double debt = Double.parseDouble(res.getString("Debt"));
+        double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
+        double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
+        int accountNumber = Integer.parseInt(res.getString("Account_number"));
+        Date validThru = convertValidThru(res.getString("Valid_thru"));
+        String id = res.getString("ID");
+
+        return new User(new Civilian(name, debt, creditBalance, creditLimit,
+                accountNumber, validThru, id));
+    }
+
+    private static User exportMerchant(ResultSet res) throws SQLException {
+        String name = res.getString("Name");
+        double totalProfit = Double.parseDouble(res.getString("Total_profit"));
+        double debt = Double.parseDouble(res.getString("Debt"));
+        double commission = Double.parseDouble(res.getString("Commission"));
+        int accountNumber = Integer.parseInt(res.getString("Account_number"));
+        String id = res.getString("ID");
+
+        return new User(new Merchant(id, name, accountNumber, commission, totalProfit, debt));
+    }
+
+    private static User exportCompany(ResultSet res) throws SQLException, ParseException {
+        String name = res.getString("Name");
+        double debt = Double.parseDouble(res.getString("Debt"));
+        double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
+        double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
+        int accountNumber = Integer.parseInt(res.getString("Account_number"));
+        Date validThru = convertValidThru(res.getString("Valid_thru"));
+        String id = res.getString("ID");
+
+        return new User(new Company(name, debt, creditBalance, creditLimit,
+                accountNumber, validThru, id));
+    }
+
+    private static User exportECivilian(ResultSet res) throws SQLException, ParseException {
+        assert (res.getString(3).equals(res.getString(10)));
+        //Civilian export
+        String Name = res.getString(1);
+        String ID = res.getString(2);
+        Civilian employee = new Civilian(ID, Name, "employee_civilian");
+
+        //Company export
+        Name = res.getString(4);
+        ID = res.getString(10);
+        double debt = Double.parseDouble(res.getString("Debt"));
+        double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
+        double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
+        int accountNumber = Integer.parseInt(res.getString("Account_number"));
+        Date validThru = convertValidThru(res.getString("Valid_thru"));
+        Company company = new Company(Name, debt, creditBalance, creditLimit, accountNumber, validThru, ID);
+
+        return new User(employee, company);
+    }
+
+    private static User exportEMerchant(ResultSet res) throws SQLException, ParseException {
+        assert (res.getString(3).equals(res.getString(12)));
+        //merchant export
+        String Name = res.getString(1);
+        String ID = res.getString(2);
+        double totalProfit = Double.parseDouble(res.getString("Total_profit"));
+        double commission = Double.parseDouble(res.getString("Commission"));
+        Merchant employee = new Merchant(ID, Name, totalProfit, commission);
+
+        //Company export
+        Name = res.getString(6);
+        ID = res.getString(12);
+        double debt = Double.parseDouble(res.getString("Debt"));
+        double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
+        double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
+        int accountNumber = Integer.parseInt(res.getString("Account_number"));
+        Date validThru = convertValidThru(res.getString("Valid_thru"));
+        Company company = new Company(Name, debt, creditBalance, creditLimit, accountNumber, validThru, ID);
+
+        return new User(employee, company);
+    }
+
+    private static Date convertValidThru(String date) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date d = formatter.parse(date);
+        return new java.sql.Date(d.getTime());
+    }
 }
