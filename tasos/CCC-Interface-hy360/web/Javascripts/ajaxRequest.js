@@ -39,24 +39,29 @@ function ajaxLoginRequest() {
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader('action', 'login');
     type = document.getElementById("user_account_type");
-    works = document.getElementById("extraProperties");
     pagePrepare();
     if (email === null && type === null) {
         xhr.send();
     } else {
-        if (type.value !== "company") {
-            if (works.value === "yes") {
-                newType = "employee_" + type.value;
+        if (!document.getElementById("login_form").checkValidity()) {
+            document.getElementById("usr_login_error").innerHTML = "Invalid email";
+            document.getElementById("usr_login_error").style.color = "red";
+            pageReady();
+        } else {         
+            works = document.login.employee;
+            if (type.value !== "company") {
+                if (works.value === "yes") {
+                    newType = "employee_" + type.value;
+                } else {
+                    newType = type.value;
+                }
             } else {
                 newType = type.value;
             }
-        } else {
-            newType = type.value;
+            document.getElementById("main_container").setAttribute("data-type", type.value);
+            xhr.send('email=' + email.value + '&type=' + newType);
         }
-        document.getElementById("main_container").setAttribute("data-type", type.value);
-        xhr.send('email=' + email.value + '&type=' + newType);
     }
-
 }
 
 function ajaxOpenAccountRequest() {
@@ -74,6 +79,8 @@ function ajaxOpenAccountRequest() {
                     var err = xhr.getAllResponseHeader("error");
                     document.getElementById("usrEMAIL_err").innerHTML = err;
                 } else {
+                    var email = xhr.getResponseHeader("id");
+                    setWelcomeMessage(email);
                     document.getElementById("main_container").innerHTML = xhr.responseText;
                     succeed_login_action();
                 }
@@ -209,44 +216,6 @@ function ajaxEmployeeAction() {
         }, 2000));
         return;
     }
-}
-
-function ajaxRefreshUser() {
-    "use strict";
-    var xhr;
-    xhr = new XMLHttpRequest();
-    xhr.open('POST', 'CompanyServlet');
-    xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            if (!cookieExist(xhr.getResponseHeader("fail"))) {
-                document.getElementById("home_but").click();
-            } else {
-                var user;
-                user = JSON.parse(xhr.responseText);
-                if (user.type === "merchant") {
-                    document.getElementById("cardNumber").innerHTML = user.cardNumber;
-                    document.getElementById("cardHolder").innerHTML = user.cardHolder;
-                    document.getElementById("totalProfit").innerHTML = user.totalProfit;
-                    document.getElementById("debtValue").innerHTML = user.debtToCCC;
-                    document.getElementById("supply").innerHTML = user.supply;
-                } else {
-                    document.getElementById("cardNumber").innerHTML = user.cardNumber;
-                    document.getElementById("cardHolder").innerHTML = user.cardHolder;
-                    document.getElementById("cardExpired").innerHTML = user.expiredThru;
-                    document.getElementById("cardLimit").innerHTML = user.creditLimit;
-                    document.getElementById("availableCreditBalance").innerHTML = user.availableCreditBalance;
-                    document.getElementById("debtValue").innerHTML = user.currentDebt;
-                }
-            }
-        } else if (xhr.status !== 200) {
-            window.alert("Request failed. Returned status of " + xhr.status);
-        }
-        pageReady();
-    };
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', 'refresh');
-    pagePrepare();
-    xhr.send();
 }
 
 function setWelcomeMessage(email) {

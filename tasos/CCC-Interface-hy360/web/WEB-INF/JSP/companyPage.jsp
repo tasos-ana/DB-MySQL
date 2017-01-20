@@ -34,7 +34,7 @@
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
-                              onclick="ajaxRefreshUser()">Home</a></li>
+                              onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Add employee</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>

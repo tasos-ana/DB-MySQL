@@ -61,7 +61,7 @@ function openAccount_action() {
     renderPage();
 }
 
-function userPage_action(){
+function userPage_action() {
     succeed_login_action();
 }
 
@@ -128,28 +128,37 @@ function getAccountDebtValue() {
     return document.getElementById("debtValue").value;
 }
 
-function updateMerchantDebt(){
+function updateMerchantDebt() {
     var value;
     value = document.getElementById("debtValue").innerHTML;
     document.getElementById("debt_amount").value = value;
 }
 
-function extraProperties(){
+function extraProperties() {
     var type = document.getElementById("user_account_type").value;
-    if(type === "company"){
+    if (type === "company") {
         document.getElementById("extraProperties").style.display = "none";
-    }else{
+    } else {
         document.getElementById("extraProperties").style.display = "block";
     }
 }
 
-
-function addEmployeeAction(){
+function addEmployeeAction() {
     document.getElementById("removeEmployeeContainer").style.display = "none";
     document.getElementById("addEmployeeContainer").style.display = "block";
 }
 
-function removeEmployeeAction(){
+function removeEmployeeAction() {
     document.getElementById("removeEmployeeContainer").style.display = "block";
     document.getElementById("addEmployeeContainer").style.display = "none";
+}
+
+function emailCheckValidity() {
+    if (!document.getElementById('login_form').checkValidity()) {
+        document.getElementById('usr_login_error').innerHTML = 'Invalid email';
+        document.getElementById('usr_login_error').style.color = 'red';
+    } else {
+        document.getElementById('usr_login_error').innerHTML = 'Valid email';
+        document.getElementById('usr_login_error').style.color = 'green';
+    }
 }

@@ -18,10 +18,10 @@
     double debt, creditBalance, creditLimit;
     int accountNumber;
 
-    name = user.getCivilian().getName();
+    assert (user.isCivilian() || user.isEmployeeCivilian());
     if (user.isCivilian()) {
         Civilian c = user.getCivilian();
-
+        name = c.getName();
         companyId = null;
         companyName = null;
         debt = c.getDebt();
@@ -31,7 +31,7 @@
         validThru = c.getValidThru().toString();
     } else {
         Company c = user.getCompany();
-
+        name = user.getEmployeeCivilian().getName();
         companyId = c.getId();
         companyName = c.getName();
         debt = c.getDebt();
@@ -47,14 +47,13 @@
     });
     $(function () {
         $("#datepickerbefore").datepicker();
-    });
-</script>
+    });</script>
 <div class="container">
     <h2>Customer dashboard</h2>
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
-                              onclick="ajaxRefreshUser()">Home</a></li>
+                              onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#buy" class="darkcolor">Buy</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
         <li><a data-toggle="tab" href="#refund" class="darkcolor">Refund</a></li>

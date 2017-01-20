@@ -1,10 +1,7 @@
 package servlets;
 
 import cs360db.db.dbAPI;
-import cs360db.model.MerchantCreditCard;
-import cs360db.model.User;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Random;
@@ -69,9 +66,6 @@ public class CompanyServlet extends HttpServlet {
                     break;
                 case "check":
                     checkAction(request, response);
-                    break;
-                case "refresh":
-                    refreshAction(request, response);
                     break;
                 case "addEmployee":
                     addEmployeeAction(request, response);
@@ -191,47 +185,6 @@ public class CompanyServlet extends HttpServlet {
         } else {
             response.setHeader("fail", "Missing Parameters");
         }
-    }
-
-    private void refreshAction(HttpServletRequest request, HttpServletResponse response)
-            throws ClassNotFoundException, ParseException, IOException {
-//        String email, type;
-//        email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
-//        type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
-//
-//        if (email == null && type == null) {
-//            response.setHeader("error", "we don't have cookie");
-//        } else {
-//            CharSequence str = "merchant";
-//            User user = dbAPI.getUser(type, email);
-//            if (type.contains(str)) {
-//                if (user.getCard() instanceof MerchantCreditCard) {
-//                    MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
-//                    try (PrintWriter out = response.getWriter()) { // construct JSON object
-//                        out.append("{\"cardNumber\":\"").append("" + cc.getAccountNumber()).append("\"");
-//                        out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
-//                        out.append(",\"totalProfit\":\"").append("" + cc.getTotalProfit()).append("\"");
-//                        out.append(",\"debtToCCC\":\"").append("" + cc.getCurrentDebt()).append("\"");
-//                        out.append(",\"supply\":\"").append("" + cc.getSupply()).append("\"");
-//                        out.append(",\"type\":\"").append("" + "merchant").append("\"");
-//                        out.append("}");
-//                    }
-//                } else {
-//                    assert (false);
-//                }
-//            } else {
-//                try (PrintWriter out = response.getWriter()) { // construct JSON object
-//                    out.append("{\"cardNumber\":\"").append("" + user.getCard().getAccountNumber()).append("\"");
-//                    out.append(",\"cardHolder\":\"").append(user.getName()).append("\"");
-//                    out.append(",\"expiredThru\":\"").append(user.getCard().getValidThru()).append("\"");
-//                    out.append(",\"creditLimit\":\"").append("" + user.getCard().getCreditLimit()).append("\"");
-//                    out.append(",\"availableCreditBalance\":\"").append("" + user.getCard().getAvailableCreditBalance()).append("\"");
-//                    out.append(",\"currentDebt\":\"").append("" + user.getCard().getCurrentDebt()).append("\"");
-//                    out.append(",\"type\":\"").append("customer").append("\"");
-//                    out.append("}");
-//                }
-//            }
-//        }
     }
 
     private void addEmployeeAction(HttpServletRequest request, HttpServletResponse response)

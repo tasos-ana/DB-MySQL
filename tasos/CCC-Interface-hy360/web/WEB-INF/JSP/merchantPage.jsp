@@ -15,22 +15,25 @@
     User user = (User) context.getAttribute("data");
     context.removeAttribute("data"); // clear after use
     String name, companyId, companyName;
-    double debt,  commission, totalProfit;
+    double debt, commission, totalProfit;
     int accountNumber;
 
-    name = user.getMerchant().getName();
-    commission = user.getMerchant().getCommission();
-    totalProfit = user.getMerchant().getTotalProfit();
+    assert (user.isMerchant() || user.isEmployeeMerchant());
     if (user.isMerchant()) {
         Merchant c = user.getMerchant();
-
+        name = c.getName();
+        commission = c.getCommission();
+        totalProfit = c.getTotalProfit();
         companyId = null;
         companyName = null;
         debt = c.getDebt();
         accountNumber = c.getAccountNumber();
     } else {
         Company c = user.getCompany();
-
+        Merchant m = user.getMerchant();
+        name = m.getName();
+        commission = m.getCommission();
+        totalProfit = m.getTotalProfit();
         companyId = c.getId();
         companyName = c.getName();
         debt = c.getDebt();
@@ -50,7 +53,7 @@
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
-                              onclick="ajaxRefreshUser()">Home</a></li>
+                              onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor"
                onclick="updateMerchantDebt()">Debt</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
@@ -98,7 +101,7 @@
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
-                    <span><input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%= debt %>">&#8364</span>
+                    <span><input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%= debt%>">&#8364</span>
                     <div class="title_text">Payoff:</div>
                     <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
