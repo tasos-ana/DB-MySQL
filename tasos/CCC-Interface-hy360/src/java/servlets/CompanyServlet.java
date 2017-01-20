@@ -79,6 +79,9 @@ public class CompanyServlet extends HttpServlet {
                 case "removeEmployee":
                     removeEmployeeAction(request, response);
                     break;
+                case "checkEmployee":
+                    checkEmployeeAction(request, response);
+                    break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
             }
@@ -87,7 +90,6 @@ public class CompanyServlet extends HttpServlet {
 
     private void loginAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException, ParseException {
-
         String email = request.getParameter("email");
         String type = request.getParameter("type");
         if (email == null && type == null) {
@@ -100,7 +102,7 @@ public class CompanyServlet extends HttpServlet {
                 StringBuilder url = new StringBuilder();
                 url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
-                context.setAttribute("data", dbAPI.getUser(type, email));
+                context.setAttribute("data", dbAPI.getUser(email, type));
                 context.setAttribute("dataType", type);
                 forwardToPage(request, response, url.toString());
             }
@@ -117,7 +119,7 @@ public class CompanyServlet extends HttpServlet {
                 StringBuilder url = new StringBuilder();
                 url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
-                context.setAttribute("data", dbAPI.getUser(type, email));
+                context.setAttribute("data", dbAPI.getUser(email, type));
                 context.setAttribute("dataType", type);
                 forwardToPage(request, response, url.toString());
             }
@@ -159,11 +161,11 @@ public class CompanyServlet extends HttpServlet {
     private void closeAction(HttpServletRequest request, HttpServletResponse response) throws ParseException, ClassNotFoundException {
         String email = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get email
         String type = Cookies.getCookieType(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));//get type
-//        if (dbAPI.deleteUser(type, email)) {
-//            logoutAction(request, response);
-//        } else {
-//            response.setHeader("error", "Something goes wrong please re-login and try again");
-//        }
+        if (dbAPI.deleteUser(email, type)) {
+            logoutAction(request, response);
+        } else {
+            response.setHeader("error", "Something goes wrong please re-login and try again");
+        }
     }
 
     private void logoutAction(HttpServletRequest request, HttpServletResponse response) {
@@ -234,21 +236,22 @@ public class CompanyServlet extends HttpServlet {
 
     private void addEmployeeAction(HttpServletRequest request, HttpServletResponse response)
             throws ClassNotFoundException, ParseException, IOException {
-        String email, name, accountNumber, type;
+        String email, name, companyID, type;
         email = request.getParameter("accountID");
         name = request.getParameter("accountName");
-        accountNumber = request.getParameter("accountNumber");
+        companyID = request.getParameter("companyID");
         type = "employee_" + request.getParameter("accountType");
         if (missing(email)
                 || missing(name)
-                || missing(accountNumber)
+                || missing(companyID)
                 || missing(type)) {
             response.setHeader("fail", "Missing Parameters");
         } else {
             boolean exists = dbAPI.existID(email);
             if (!exists) {
                 // add new account to database
-                dbAPI.addEntity(type, email, name, accountNumber);
+                dbAPI.addEntity(email, name, type, companyID);
+                response.setHeader("succeed", "Employee added successfully");
             } else {
                 response.setHeader("error", "Email already exists");
             }
@@ -257,6 +260,28 @@ public class CompanyServlet extends HttpServlet {
 
     private void removeEmployeeAction(HttpServletRequest request, HttpServletResponse response)
             throws ClassNotFoundException, ParseException, IOException {
+        String email, type;
+        email = request.getParameter("accountID");
+        type = "employee_" + request.getParameter("accountType");
+        if (dbAPI.deleteUser(email, type)) {
+            response.setHeader("succeed", "Employee removed successfully");
+        } else {
+            response.setHeader("error", "Something goes wrong please try again");
+        }
+    }
+
+    private void checkEmployeeAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
+        String email, companyID, type;
+        email = request.getParameter("email");
+        companyID = request.getParameter("companyID");
+        type = "employee_" + request.getParameter("employeeType");
+        if (!missing(email) || !missing(companyID)) {
+            if (!dbAPI.existEmployee(email, companyID, type)) {
+                response.setHeader("error", "User isn't employee of your company");
+            }
+        } else {
+            response.setHeader("fail", "Missing Parameters");
+        }
 
     }
 

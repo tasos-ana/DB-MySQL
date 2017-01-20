@@ -57,10 +57,10 @@ public class dbAPI {
         return UserDB.getUser(email, type);
     }
 
-//    public static boolean deleteUser(String type, String email) throws ParseException, ClassNotFoundException {
-//        return UserDB.deleteUser(email);
-//    }
-    
+    public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
+        return UserDB.deleteUser(email, type);
+    }
+
     //done
     public static boolean existID(String email) throws ClassNotFoundException {
         boolean exist = false;
@@ -87,7 +87,7 @@ public class dbAPI {
 
         return exist;
     }
-    
+
     //done
     public static boolean existID(String email, String table) throws ClassNotFoundException {
         boolean exist = false;
@@ -96,9 +96,35 @@ public class dbAPI {
                     Statement stmt = con.createStatement()) {
 
                 stmt.execute(Queries.exists(email, table));
-                
+
                 if (stmt.getResultSet().next() == true) {
                     System.out.println("#DB: The member alreadyExists");
+                    exist = true;
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return exist;
+    }
+
+    public static boolean existEmployee(String email, String companyID, String table) throws ClassNotFoundException {
+        boolean exist = false;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+
+                stmt.execute(Queries.existEmployee(email, companyID, table));
+
+                if (stmt.getResultSet().next() == true) {
+                    System.out.println("#DB: The member: '" + email + "' is employee of company: '" + companyID + "'");
                     exist = true;
                 }
 

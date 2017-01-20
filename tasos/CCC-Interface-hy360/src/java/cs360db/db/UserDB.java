@@ -32,10 +32,10 @@ class UserDB {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
 
-                String insQuery = Queries.getUser(type, email);
+                String insQuery = Queries.getUser(email, type);
                 stmt.execute(insQuery);
                 ResultSet res = stmt.getResultSet();
-                
+
                 if (res.next() == true) {
                     System.out.println(res.getString(1));
                     user = exportUser(res, type);
@@ -120,9 +120,9 @@ class UserDB {
                             u.getId(), companyId);
                 } else {
                     Merchant u = user.getMerchant();
-                    table = "employee_civilian";
+                    table = "employee_merchant";
                     insQuery = Queries.insertEMerchant(table, u.getName(),
-                            u.getId(), companyId, u.getTotalProfit(), u.getCommission());
+                            u.getId(), companyId);
                 }
                 stmt.executeUpdate(insQuery);
                 System.out.println("#DB: The user was successfully added in [ " + table + " ] of the database.");
@@ -245,4 +245,39 @@ class UserDB {
         java.util.Date d = formatter.parse(date);
         return new java.sql.Date(d.getTime());
     }
+
+    /**
+     * Delete information for specific user
+     *
+     * @param email
+     * @throws ClassNotFoundException
+     */
+    protected static boolean deleteUser(String email, String type) throws ClassNotFoundException {
+        boolean exist = false;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+                String insQuery = Queries.deleteUser(email, type);
+
+                int state = stmt.executeUpdate(insQuery);
+
+                if (state > 0) {
+                    exist = true;
+                    System.out.println("#DB: The user was successfully deleted from the database.");
+                } else {
+                    System.out.println("#DB: Something goes wrong while deleting a user: '" + email + "'. User don't exist.");
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return exist;
+    }
+
 }

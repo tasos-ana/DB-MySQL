@@ -9,17 +9,13 @@ var validationAPI = function () {
     "use strict";
     var formValid = {
         usrEMAIL: false,
-        usrNAME: false
+        usrNAME: false,
+        employeeEMAIL: false
     };
 
     function usrEMAILValidation() {
-        var usrEMAIL, current, pattern, xhr;
+        var usrEMAIL, pattern, xhr;
         usrEMAIL = document.getElementById("usrEMAIL");
-        try {
-            current = document.getElementById("email_label").getAttribute("data-current");
-        } catch (e) {
-
-        }
 
         if (usrEMAIL.value.indexOf(" ") !== -1) {
             document.getElementById("usrEMAIL_err").style.color = "red";
@@ -61,7 +57,6 @@ var validationAPI = function () {
         }
     }
 
-
     function usrNAMEValidation() {
         var usrNAME, nameLen, letter;
 
@@ -80,14 +75,75 @@ var validationAPI = function () {
         formValid.usrNAME = false;
     }
 
+    function hasEmployeeValidation() {
+        var companyID;
+        companyID = document.getElementById("companyID").getAttribute("data-companyID");
+
+        var usrEMAIL, pattern, xhr, type;
+        usrEMAIL = document.getElementById("removeUsrEMAIL");
+        type = document.employee.accountType;
+
+        if (usrEMAIL.value.indexOf(" ") !== -1) {
+            document.getElementById("removeUsrEMAIL_err").style.color = "red";
+            document.getElementById("removeUsrEMAIL_err").innerHTML = "Space not allowed";
+            formValid.employeeEMAIL = false;
+            return;
+        }
+
+        pattern = /(.+)@([A-Za-z]+)\.([A-Za-z]+)([\.A-Za-z]*)/;
+        if (usrEMAIL.value.match(pattern)) {
+            xhr = new XMLHttpRequest();
+            xhr.open('POST', 'CompanyServlet');
+            xhr.onload = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    if (xhr.getResponseHeader("error") !== null) {
+                        document.getElementById("removeUsrEMAIL_err").style.color = "red";
+                        document.getElementById("removeUsrEMAIL_err").innerHTML = xhr.getResponseHeader("error");
+                        formValid.employeeEMAIL = false;
+                    } else {
+                        document.getElementById("removeUsrEMAIL_err").style.color = "green";
+                        document.getElementById("removeUsrEMAIL_err").innerHTML = "&#10004";
+                        formValid.employeeEMAIL = true;
+                    }
+                } else if (xhr.status !== 200) {
+                    window.alert("Email check request failed. Returned status of " + xhr.status);
+                    document.getElementById("removeUsrEMAIL_err").style.color = "red";
+                    document.getElementById("main_container").innerHTML = xhr.responseText;
+                    formValid.employeeEMAIL = false;
+                }
+            };
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('Action', 'checkEmployee');
+            xhr.send('email=' + usrEMAIL.value + "&companyID=" + companyID + "&employeeType=" + type.value);
+
+        } else {
+            document.getElementById("removeUsrEMAIL_err").style.color = "red";
+            document.getElementById("removeUsrEMAIL_err").innerHTML = "Invalid email";
+            formValid.employeeEMAIL = false;
+        }
+    }
+
     function validAll() {
         usrEMAILValidation();
         usrNAMEValidation();
     }
 
+    function validForm() {
+        try {
+            var action = document.employee.action;
+            if (action.value === "addEmployee") {
+                return (formValid.usrEMAIL && formValid.usrNAME);
+            } else {
+                return formValid.employeeEMAIL;
+            }
+        } catch (e) {
+            return (formValid.usrEMAIL && formValid.usrNAME);
+        }
+    }
+
     return {
         form: function () {
-            return (formValid.usrEMAIL && formValid.usrNAME);
+            return validForm();
         },
         validateAll: function () {
             validAll();
@@ -97,6 +153,7 @@ var validationAPI = function () {
         },
         usrNAME: function () {
             usrNAMEValidation();
-        }
+        },
+        hasEmployee: hasEmployeeValidation
     };
 }();

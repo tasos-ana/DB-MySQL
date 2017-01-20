@@ -191,3 +191,7 @@ input:valid {
 #extraProperties{
     display: none;
 }
+
+#removeEmployeeContainer{
+    display: none;
+}

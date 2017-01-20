@@ -113,7 +113,7 @@ function ajaxCloseAccountRequest() {
                     document.getElementById("home_but").click();
                 } else {
                     if (xhr.getResponseHeader("error") !== null) {
-                        window.alert(xhr.responseText);
+                        window.alert(xhr.getResponseHeader("error"));
                     } else {
                         window.alert("Your account close with succed!");
                         document.getElementById("page_message").innerHTML = "Credit Card Company";
@@ -155,45 +155,54 @@ function ajaxLogoutRequest() {
 
 function ajaxEmployeeAction() {
     if (validationAPI.form()) {
-        var accountNumber, accountID, accountName, accountType, action;
-    accountNumber = document.employee.accountNumber;
-    accountID = document.employee.accountID;
-    accountName = document.employee.accountName;
-    accountType = document.employee.accountType;
-    action = document.employee.action;
-    var xhr;
-    xhr = new XMLHttpRequest();
-    xhr.open('POST', 'CompanyServlet');
-    xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            if (!cookieExist(xhr.getResponseHeader("fail"))) {
-                document.getElementById("home_but").click();
-            } else {
-                if (xhr.getResponseHeader("error") !== null) {
-                    window.alert(xhr.responseText);
-                } else {
-                    window.alert("New Employee added successful");
-                    document.employee.reset();
-                    document.getElementById("usrNAME_err").innerHTML = "*";
-                    document.getElementById("usrNAME_err").style.color = "red";
-                    
-                    document.getElementById("usrEMAIL_err").innerHTML = "*";
-                    document.getElementById("usrEMAIL_err").style.color = "red";
-                }
-            }
-            pageReady();
-        } else if (xhr.status !== 200) {
-            window.alert("Request failed. Returned status of " + xhr.status);
+        var companyID, accountID, accountName, accountType, action;
+        companyID = document.getElementById("companyID").getAttribute("data-companyID");
+
+        accountName = document.employee.accountName;
+        accountType = document.employee.accountType;
+        action = document.employee.action;
+        if (action.value === "addEmployee") {
+            accountID = document.employee.accountID;
+        } else {
+            accountID = document.employee.removeAccountId;
         }
-    };
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', action.value);
-    pagePrepare();
-    xhr.send("accountNumber=" + accountNumber.value +
-            "&accountID=" + accountID.value +
-            "&accountName=" + accountName.value +
-            "&accountType=" + accountType.value);
-    }else{
+        var xhr;
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                    document.getElementById("home_but").click();
+                } else {
+                    if (xhr.getResponseHeader("error") !== null) {
+                        window.alert(xhr.getResponseHeader("error"));
+                    } else {
+                        window.alert(xhr.getResponseHeader("succeed"));
+                        document.employee.reset();
+                        addEmployeeAction();
+                        document.getElementById("usrNAME_err").innerHTML = "*";
+                        document.getElementById("usrNAME_err").style.color = "red";
+
+                        document.getElementById("usrEMAIL_err").innerHTML = "*";
+                        document.getElementById("usrEMAIL_err").style.color = "red";
+
+                        document.getElementById("removeUsrEMAIL_err").innerHTML = "*";
+                        document.getElementById("removeUsrEMAIL_err").style.color = "red";
+                    }
+                }
+                pageReady();
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
+            }
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('action', action.value);
+        pagePrepare();
+        xhr.send("companyID=" + companyID +
+                "&accountID=" + accountID.value +
+                "&accountName=" + accountName.value +
+                "&accountType=" + accountType.value);
+    } else {
         document.getElementById("form_alert").removeAttribute("hidden");
         document.getElementById("form_alert").addEventListener("mouseover", setTimeout(function () {
             document.getElementById("form_alert").setAttribute("hidden", "true");

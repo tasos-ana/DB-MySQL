@@ -34,6 +34,16 @@ public class Queries {
         return insQuery.toString();
     }
 
+    public static String existEmployee(String id, String companyID, String table) {
+        assert(table.contains("employee"));
+        StringBuilder insQuery = new StringBuilder();  
+        insQuery.append(" SELECT c.id FROM company c, ").append(table).append(" e")
+                .append(" WHERE e.Company_ID = c.ID and e.ID = '").append(id).append("'")
+                .append(" and e.Company_ID = '").append(companyID).append("'");
+
+        return insQuery.toString();
+    }
+
     public static String insertCivilian(String table, String name, int accountNumber,
             Date validThru, String id) {
         StringBuilder insQuery = new StringBuilder();
@@ -58,8 +68,8 @@ public class Queries {
                 .append(" VALUES (")
                 .append("'").append(name).append("',")
                 .append("'").append(id).append("',")
-                .append("'").append(companyId).append("',");
-
+                .append("'").append(companyId).append("')");
+        System.out.println(insQuery.toString());
         return insQuery.toString();
     }
 
@@ -81,22 +91,20 @@ public class Queries {
     }
 
     public static String insertEMerchant(String table, String name, String id,
-            String companyId, double totalProfit, double commission) {
+            String companyId) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append("INSERT INTO ").append(table)
-                .append(" (NAME, ID, COMPANY_ID, TOTAL_PROFIT, COMMISSION)")
+                .append(" (NAME, ID, COMPANY_ID)")
                 .append(" VALUES (")
                 .append("'").append(name).append("',")
                 .append("'").append(id).append("',")
-                .append("'").append(companyId).append("')")
-                .append("'").append(totalProfit).append("')")
-                .append("'").append(commission).append("')");
+                .append("'").append(companyId).append("')");
 
         return insQuery.toString();
     }
 
-    public static String getUser(String table, String id) {
+    public static String getUser(String id, String table) {
         StringBuilder insQuery = new StringBuilder();
 
         if (table.contains("employee")) {
@@ -107,36 +115,17 @@ public class Queries {
                     .append(" WHERE ID = '").append(id).append("'");
         }
 
-        System.out.println(insQuery.toString());
         return insQuery.toString();
     }
-    /*
-                stmt.execute(insQuery.toString());
 
-                ResultSet res = stmt.getResultSet();
+    public static String deleteUser(String id, String table) {
+        StringBuilder insQuery = new StringBuilder();
 
-                if (res.next() == true) {
+        insQuery.append("DELETE FROM ").append(table)
+                .append(" WHERE ")
+                .append(" ID = ").append("'").append(id).append("'");
 
-                    user.setEmail(res.getString("ID"));
-                    user.setName(res.getString("Name"));
-                    user.setType(type);
-                    user.getCard().setAccountNumber(res.getInt("Account_number"));
-                    CharSequence str = "merchant";
-                    if (type.contains(str)) {//it's merchant or employee_merchant
-                        if (user.getCard() instanceof MerchantCreditCard) {
-                            MerchantCreditCard cc = (MerchantCreditCard) user.getCard();
-                            cc.setCurrentDebt(res.getDouble("Debt_to_ccc"));
-                            cc.setSupply(res.getFloat("Supply"));
-                            cc.setTotalProfit(res.getDouble("Total_profit"));
-                        } else {
-                            assert (false);
-                        }
-                    } else {//it's company or civilian
-                        user.getCard().setAvailableCreditBalance(res.getDouble("Available_credit_balance"));
-                        user.getCard().setCreditLimit(res.getDouble("Credit_limit"));
-                        user.getCard().setCurrentDebt(res.getDouble("Current_debt"));
-                        user.getCard().setValidThru(res.getString("Valid_thru"));
-                    }
-                }
-     */
+        return insQuery.toString();
+    }
+
 }

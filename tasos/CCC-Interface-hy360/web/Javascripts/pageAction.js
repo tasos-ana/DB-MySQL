@@ -142,3 +142,14 @@ function extraProperties(){
         document.getElementById("extraProperties").style.display = "block";
     }
 }
+
+
+function addEmployeeAction(){
+    document.getElementById("removeEmployeeContainer").style.display = "none";
+    document.getElementById("addEmployeeContainer").style.display = "block";
+}
+
+function removeEmployeeAction(){
+    document.getElementById("removeEmployeeContainer").style.display = "block";
+    document.getElementById("addEmployeeContainer").style.display = "none";
+}

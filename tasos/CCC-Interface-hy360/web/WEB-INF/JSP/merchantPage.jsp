@@ -4,22 +4,38 @@
     Author     : Tasos
 --%>
 
+<%@page import="cs360db.model.Merchant"%>
+<%@page import="cs360db.model.Company"%>
 <%@page import="cs360db.model.MerchantCreditCard"%>
 <%@page import="cs360db.model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     ServletContext context = getServletContext();
+    assert (context.getAttribute("data") instanceof User);
+    User user = (User) context.getAttribute("data");
+    context.removeAttribute("data"); // clear after use
+    String name, companyId, companyName;
+    double debt,  commission, totalProfit;
+    int accountNumber;
 
-    if (context.getAttribute("data") instanceof User) {
-        User user = (User) context.getAttribute("data");
-        MerchantCreditCard cc;
-        if (user.getCard() instanceof MerchantCreditCard) {
-            cc = (MerchantCreditCard) user.getCard();
-        } else {
-            cc = null;
-            assert (false);
-        }
-        context.removeAttribute("data"); // clear after use    
+    name = user.getMerchant().getName();
+    commission = user.getMerchant().getCommission();
+    totalProfit = user.getMerchant().getTotalProfit();
+    if (user.isMerchant()) {
+        Merchant c = user.getMerchant();
+
+        companyId = null;
+        companyName = null;
+        debt = c.getDebt();
+        accountNumber = c.getAccountNumber();
+    } else {
+        Company c = user.getCompany();
+
+        companyId = c.getId();
+        companyName = c.getName();
+        debt = c.getDebt();
+        accountNumber = c.getAccountNumber();
+    }
 %>
 <script>
     $(function () {
@@ -34,9 +50,9 @@
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
-                                onclick="ajaxRefreshUser()">Home</a></li>
+                              onclick="ajaxRefreshUser()">Home</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor"
-                                onclick="updateMerchantDebt()">Debt</a></li>
+               onclick="updateMerchantDebt()">Debt</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>
     <div class="tab-content">
@@ -48,21 +64,29 @@
                         <thead>
                             <tr class="text-left">
                                 <th>#</th>
+                                    <%if (companyId != null) {%>            
+                                <th>Company name</th>
+                                <th>Company ID</th>
+                                    <%}%>
                                 <th>Card number</th>
                                 <th>Card holder</th>
                                 <th>Total profit</th>
                                 <th>Debt to CCC</th>
-                                <th>Supply</th>
+                                <th>Commission</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="text-left">
                                 <td id="accountNo">1</td>
-                                <td id="cardNumber"> <%= cc.getAccountNumber()%> </td>
-                                <td id="cardHolder"> <%= user.getName() %> </td>
-                                <td><span id="totalProfit"> <%=cc.getTotalProfit()%> </span> &#8364</td>
-                                <td><span id="debtValue"> <%=cc.getCurrentDebt()%> </span> &#8364</td>
-                                <td><span id="supply"> <%=cc.getSupply()%> </span> &#8364</td>
+                                <%if (companyId != null) {%>            
+                                <td id="companyName"><%= companyName%></td>
+                                <td id="companyId"><%= companyId%></td>
+                                <%}%>
+                                <td id="cardNumber"><%= accountNumber%></td>
+                                <td id="cardHolder"><%= name%></td>
+                                <td><span id="totalProfit"><%= totalProfit%></span> &#8364</td>
+                                <td><span id="debtValue"><%= debt%></span> &#8364</td>
+                                <td><span id="supply"><%= commission%></span> &#8364</td>
                             </tr>
                         </tbody>
                     </table>
@@ -74,7 +98,7 @@
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
-                    <span><input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%=cc.getCurrentDebt()%>">&#8364</span>
+                    <span><input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%= debt %>">&#8364</span>
                     <div class="title_text">Payoff:</div>
                     <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
@@ -102,7 +126,3 @@
         </div>
     </div>
 </div>
-<%  } else {
-        System.out.println("merchantPage.jsp: attribute \"data\" should contain a 'User' object");
-    }
-%>
