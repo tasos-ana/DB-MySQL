@@ -106,7 +106,6 @@ public class dbAPI {
         boolean state = false, executeSucceed = false;
         String updateCivilianQuery, updateMerchantQuery;
         String merchantType = UserDB.getMerchantType(merchantID);
-        //java.sql.Date currDate = new java.sql.Date(new java.util.Date().getTime());
 
         java.util.Date dateStr = new java.util.Date();
         java.sql.Date currDate = new java.sql.Date(dateStr.getTime());
@@ -118,8 +117,6 @@ public class dbAPI {
             updateCivilianQuery = Queries.updateCivilian_charge(civilianID, civilianType, value, currDate);
             updateMerchantQuery = Queries.updateMerchant_charge(merchantID, merchantType, value);
         }
-        System.out.println("Civilian" + updateCivilianQuery);
-        System.out.println("Merchant" + updateMerchantQuery);
         executeSucceed = UserDB.executeUpdate(updateCivilianQuery, updateMerchantQuery);
 
         if (executeSucceed) {

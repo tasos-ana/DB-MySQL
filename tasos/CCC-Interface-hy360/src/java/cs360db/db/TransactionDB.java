@@ -43,7 +43,6 @@ public class TransactionDB {
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
-                System.out.println("record: " + insQuery);
                 stmt.executeUpdate(insQuery);
                 // Close connection
                 stmt.close();

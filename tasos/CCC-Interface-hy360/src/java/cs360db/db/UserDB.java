@@ -90,7 +90,6 @@ class UserDB {
                 ResultSet res = stmt.getResultSet();
 
                 if (res.next() == true) {
-                    System.out.println(res.getString(1));
                     user = exportUser(res, type);
                 }
 
@@ -263,7 +262,6 @@ class UserDB {
             con.setAutoCommit(false);
 //            startOfTransaction = con.setSavepoint();
             //stage 2 execute the first update
-            System.out.println("Civilian2: " + updateCivilianQuery);
             succeed = stmt.executeUpdate(updateCivilianQuery);
             if (succeed > 0) {
                 //stage 3 execute the second update
