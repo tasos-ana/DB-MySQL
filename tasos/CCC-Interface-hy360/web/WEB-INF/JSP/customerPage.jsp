@@ -53,8 +53,9 @@
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
-                              onclick="document.getElementById('home_link').click();">Home</a></li>
-        <li><a data-toggle="tab" href="#buy" class="darkcolor">Buy</a></li>
+                                onclick="document.getElementById('home_link').click();">Home</a></li>
+        <li><a data-toggle="tab" href="#buy" class="darkcolor"
+                                onclick="ajaxMerchantsDropdownRequest()">Buy</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
         <li><a data-toggle="tab" href="#refund" class="darkcolor">Refund</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
@@ -105,11 +106,12 @@
                 <fieldset>
                     <legend class="legend_text">Buy goods</legend>
                     <div class="title_text">Merchant:</div>
-                    <input type="text" class="text-center" placeholder="Required" size="30" pattern="[a-zA-Z0-9]+"><br>
+                    <div id="merchantsDropdownContainer"></div>
                     <div class="title_text">Items Cost:</div>
-                    <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
+                    <input type="text" class="text-center" id="buyGoods"
+                           placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
-                            onclick="">
+                            onclick="ajaxMakeTransactionRequest()">
                         Order now
                     </button>
                 </fieldset>
@@ -120,7 +122,7 @@
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
-                    <input type="text" class="text-center" id="debt_amount" size="30" readonly value=" 0,00 &#8364">
+                    <input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%= debt%> &#8364">
                     <div class="title_text">Payoff:</div>
                     <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  

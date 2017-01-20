@@ -12,10 +12,14 @@ function ajaxLoginRequest() {
             if (xhr.getResponseHeader("error") === null) {
                 var email = xhr.getResponseHeader("id");
                 setWelcomeMessage(email);
+                document.getElementById("main_container").setAttribute("data-type", xhr.getResponseHeader("dataType"));
+                document.getElementById("main_container").setAttribute("data-userID", xhr.getResponseHeader("dataEmail"));
                 document.getElementById("main_container").innerHTML = xhr.responseText;
                 succeed_login_action();
                 pageReady();
             } else {
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
                 if (!cookieExist(xhr.getResponseHeader("fail"))) {
                     document.getElementById("login_but").click();
                 } else {
@@ -47,7 +51,7 @@ function ajaxLoginRequest() {
             document.getElementById("usr_login_error").innerHTML = "Invalid email";
             document.getElementById("usr_login_error").style.color = "red";
             pageReady();
-        } else {         
+        } else {
             works = document.login.employee;
             if (type.value !== "company") {
                 if (works.value === "yes") {
@@ -58,7 +62,8 @@ function ajaxLoginRequest() {
             } else {
                 newType = type.value;
             }
-            document.getElementById("main_container").setAttribute("data-type", type.value);
+            document.getElementById("main_container").setAttribute("data-type", newType);
+            document.getElementById("main_container").setAttribute("data-userID", email.value);
             xhr.send('email=' + email.value + '&type=' + newType);
         }
     }
@@ -78,6 +83,8 @@ function ajaxOpenAccountRequest() {
                 if (xhr.getResponseHeader("error") !== null) {
                     var err = xhr.getAllResponseHeader("error");
                     document.getElementById("usrEMAIL_err").innerHTML = err;
+                    document.getElementById("main_container").removeAttribute("data-type");
+                    document.getElementById("main_container").removeAttribute("data-userID");
                 } else {
                     var email = xhr.getResponseHeader("id");
                     setWelcomeMessage(email);
@@ -86,6 +93,8 @@ function ajaxOpenAccountRequest() {
                 }
             } else if (xhr.status !== 200) {
                 window.alert("Request failed. Returned status of " + xhr.status);
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
             }
         };
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -95,6 +104,8 @@ function ajaxOpenAccountRequest() {
         type = document.getElementById("user_account_type");
         email = document.getElementById("usrEMAIL");
         name = document.getElementById("usrNAME");
+        document.getElementById("main_container").setAttribute("data-type", type.value);
+        document.getElementById("main_container").setAttribute("data-userID", email.value);
         xhr.send('email=' + email.value + '&name=' + name.value + '&type=' + type.value);
     } else {
         document.getElementById("form_alert").removeAttribute("hidden");
@@ -125,6 +136,8 @@ function ajaxCloseAccountRequest() {
                         window.alert("Your account close with succed!");
                         document.getElementById("page_message").innerHTML = "Credit Card Company";
                         logout_action();
+                        document.getElementById("main_container").removeAttribute("data-type");
+                        document.getElementById("main_container").removeAttribute("data-userID");
                     }
                 }
             } else if (xhr.status !== 200) {
@@ -135,7 +148,6 @@ function ajaxCloseAccountRequest() {
         xhr.setRequestHeader('action', 'close');
         xhr.send();
     }
-
 }
 
 function ajaxLogoutRequest() {
@@ -150,6 +162,8 @@ function ajaxLogoutRequest() {
             } else {
                 document.getElementById("page_message").innerHTML = "Credit Card Company";
                 logout_action();
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
             }
         } else if (xhr.status !== 200) {
             window.alert("Request failed. Returned status of " + xhr.status);
@@ -216,6 +230,62 @@ function ajaxEmployeeAction() {
         }, 2000));
         return;
     }
+}
+
+function ajaxMerchantsDropdownRequest() {
+    var xhr;
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    document.getElementById("merchantsDropdownContainer").innerHTML = xhr.responseText;
+                }
+            }
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action', 'merchantDropdown');
+    xhr.send();
+}
+
+function ajaxMakeTransactionRequest() {
+    "use strict";
+    var xhr, civilianID, merchantID, civilianType, transType, value;
+    civilianID = getUserID();
+    merchantID = getMerchantID_buy();
+    civilianType = getAccountType();
+    transType = "charge";
+    value = document.getElementById("buyGoods").value;
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (xhr.getResponseHeader("error") !== null) {
+                window.alert(xhr.getResponseHeader("error"));
+            } else {
+                window.alert("Succeed transaction");
+                document.getElementById("home_link").click();
+            }
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+        pageReady();
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader("action", "makeTransaction");
+    pagePrepare();
+    xhr.send("civilianID=" + civilianID + "&merchantID=" + merchantID +
+            "&civilianType=" + civilianType + "&transType=" + transType +
+            "&value=" + value);
 }
 
 function setWelcomeMessage(email) {

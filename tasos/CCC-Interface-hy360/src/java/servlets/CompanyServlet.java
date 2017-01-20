@@ -76,6 +76,12 @@ public class CompanyServlet extends HttpServlet {
                 case "checkEmployee":
                     checkEmployeeAction(request, response);
                     break;
+                case "merchantDropdown":
+                    merchantDropdownAction(request, response);
+                    break;
+                case "makeTransaction":
+                    makeTranstacionAction(request, response);
+                    break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
             }
@@ -93,6 +99,8 @@ public class CompanyServlet extends HttpServlet {
                 response.setHeader("error", "we don't have cookie");
             } else {
                 response.setHeader("id", "Hello, " + email);
+                response.setHeader("dataEmail", email);
+                response.setHeader("dataType", type);
                 StringBuilder url = new StringBuilder();
                 url.append("/WEB-INF/JSP/").append(convertType2Page(type));
                 ServletContext context = getServletContext();
@@ -106,6 +114,8 @@ public class CompanyServlet extends HttpServlet {
                 response.setHeader("error", "User not exist!");//return error
             } else {
                 response.setHeader("id", "Hello, " + email);
+                response.setHeader("dataEmail", email);
+                response.setHeader("dataType", type);
                 Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie(email, type));//create and set cookies
                 usrCookie.setMaxAge(3600);
                 response.addCookie(usrCookie);
@@ -235,7 +245,34 @@ public class CompanyServlet extends HttpServlet {
         } else {
             response.setHeader("fail", "Missing Parameters");
         }
+    }
 
+    private void merchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException, ClassNotFoundException {
+        StringBuilder url = new StringBuilder();
+
+        url.append("/WEB-INF/JSP/merchantDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getMerchants());
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void makeTranstacionAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
+        boolean succeed;
+        String civilianID, merchantID, civilianType, transType;
+        double value;
+
+        civilianID = request.getParameter("civilianID");
+        merchantID = request.getParameter("merchantID");
+        civilianType = request.getParameter("civilianType");
+        transType = request.getParameter("transType");
+        value = Double.parseDouble(request.getParameter("value"));
+        succeed = dbAPI.makeTransaction(civilianID, merchantID, civilianType, transType, value);
+        if (!succeed) {
+            response.setHeader("error", "Something goes wrong. "
+                    + "Make sure that you have enough balance or your card isnt expired");
+        }
     }
 
     private void forwardToPage(HttpServletRequest request,

@@ -8,13 +8,66 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class UserDB {
+
+    protected static boolean existUser(String email) throws ClassNotFoundException {
+        boolean exist = false;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+
+                stmt.execute(Queries.exists(email));
+
+                if (stmt.getResultSet().next() == true) {
+                    System.out.println("#DB: The member alreadyExists");
+                    exist = true;
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return exist;
+    }
+
+    protected static boolean existUser(String email, String table) throws ClassNotFoundException {
+        boolean exist = false;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+
+                stmt.execute(Queries.exists(email, table));
+
+                if (stmt.getResultSet().next() == true) {
+                    System.out.println("#DB: The member alreadyExists");
+                    exist = true;
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return exist;
+    }
 
     /**
      * Get user
@@ -52,6 +105,66 @@ class UserDB {
         }
 
         return user;
+    }
+
+    protected static String getMerchantType(String email) throws ClassNotFoundException {
+        String type;
+
+        if (existUser(email, "merchant")) {
+            type = "merchant";
+        } else {
+            type = "employee_merchant";
+        }
+        return type;
+    }
+
+    protected static ArrayList<String> getMerchants() throws ClassNotFoundException {
+        ArrayList<String> merchantsIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getAllMerchants();
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                merchantsIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return merchantsIDs;
+    }
+
+    protected static String getCompany(String email, String type) throws ClassNotFoundException {
+        String companyID = null;
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getCompany(email, type);
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            if (res.next() == true) {
+                companyID = res.getString("Company_ID");
+            }
+            // Close connection
+            stmt.close();
+            con.close();
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return companyID;
     }
 
     /**
@@ -134,6 +247,66 @@ class UserDB {
             // Log exception
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    protected static boolean executeUpdate(String updateCivilianQuery, String updateMerchantQuery)
+            throws ClassNotFoundException {
+        boolean state = false;
+        int succeed;
+//        Savepoint startOfTransaction = null;
+        Connection con = null;
+        Statement stmt = null;
+        try {
+            con = dbAPI.getConnection();
+            stmt = con.createStatement();
+            //Stage 1 disable auto commit
+            con.setAutoCommit(false);
+//            startOfTransaction = con.setSavepoint();
+            //stage 2 execute the first update
+            System.out.println("Civilian2: " + updateCivilianQuery);
+            succeed = stmt.executeUpdate(updateCivilianQuery);
+            if (succeed > 0) {
+                //stage 3 execute the second update
+                succeed = stmt.executeUpdate(updateMerchantQuery);
+                if (succeed <= 0) {
+                    //Stage 4 Roll back if second update fail
+                    con.rollback();
+                } else {
+                    //stage 4 commit after 2 succeed updates
+                    con.commit();
+                    state = true;
+                }
+            }
+        } catch (SQLException ex) {
+            try {
+                if (con != null) {
+                    con.rollback();
+                }
+            } catch (SQLException se2) {
+                se2.printStackTrace();
+            }//end try
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        } finally {
+            // Close connection
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException se2) {
+                se2.printStackTrace();
+            }// nothing we can do
+            try {
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return state;
     }
 
     private static User exportUser(ResultSet res, String type)
