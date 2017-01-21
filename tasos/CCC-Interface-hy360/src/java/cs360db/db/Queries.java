@@ -333,19 +333,6 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtEmployeeCivilian(String civilianID, String table, double value) throws ClassNotFoundException {
-        StringBuilder insQuery = new StringBuilder();
-//        String companyID = UserDB.getCompany(civilianID, table);
-//        insQuery.append(" UPDATE company co, ").append(table).append(" ec")
-//                .append(" SET")
-//                .append(" Total_profit = Total_profit + ").append(value)
-//                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
-//                .append(" WHERE ")
-//                .append(" ID = '").append(civilianID).append("'");
-
-        return insQuery.toString();
-    }
-
     static String payDebtMerchant(String merchantID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
@@ -370,8 +357,8 @@ public class Queries {
                 .append(" , Debt = Debt - ").append(value)
                 .append(" WHERE ")
                 .append(" ID = '").append(civilianID).append("'")
-                .append(" AND Credit_limit <= Credit_balance + ").append(value)
-                .append(" AND Debt > ").append(value);
+                .append(" AND Credit_limit >= Credit_balance + ").append(value)
+                .append(" AND Debt >= ").append(value);
 
         return insQuery.toString();
     }

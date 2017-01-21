@@ -45,23 +45,22 @@ public class TransactionDB {
 
     public static boolean payDebt(String userID, String userType, double value) throws ClassNotFoundException {
         boolean succeed = false, merchant, civilian, employee;
-        int retVal = 0;
+        int retVal;
         String insQuery;
         merchant = userType.contains("merchant");
         civilian = userType.contains("civilian");
         employee = userType.contains("employee");
 
+        assert (!(civilian && employee));
         if (employee && merchant) {
-            //insQuery = Queries.payDebtEmployeeMerchant(userID, userType, value);
-        } else if (employee) {
-            //insQuery = Queries.payDebtEmployeeCivilian(userID, userType, value);
+            insQuery = Queries.payDebtEmployeeMerchant(userID, userType, value);
         } else if (merchant) {
-            //insQuery = Queries.payDebtMerchant(userID, userType, value);
+            insQuery = Queries.payDebtMerchant(userID, userType, value);
         } else {
-            //insQuery = Queries.payDebtCivilian(userID, userType, value);
+            insQuery = Queries.payDebtCivilian(userID, userType, value);
         }
-
-        //retVal = executeSingleQuery(insQuery);
+        System.out.println(insQuery);
+        retVal = executeSingleQuery(insQuery);
         if (retVal > 0) {
             succeed = true;
         }

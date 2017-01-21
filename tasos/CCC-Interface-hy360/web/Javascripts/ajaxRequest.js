@@ -294,10 +294,9 @@ function ajaxMakeTransactionRequest() {
 }
 
 function ajaxPayDebtRequest() {
-    var value, debt;
-    debt = document.getElementById("debt_amount").value;
+    var value;
     value = document.getElementById("payDebt").value;
-    if (value <= 0 || value > debt) {
+    if (value <= 0) {
         window.alert("Can't make transaction with negative,zero or bigger value from your debt");
         document.getElementById("payDebt").focus();
     } else {
