@@ -42,13 +42,6 @@
         validThru = c.getValidThru().toString();
     }
 %>
-<script>
-    $(function () {
-        $("#datepickerfrom").datepicker();
-    });
-    $(function () {
-        $("#datepickerbefore").datepicker();
-    });</script>
 <div class="container">
     <h2>Customer dashboard</h2>
 
@@ -159,15 +152,15 @@
         <div id="search" class="tab-pane fade">
             <form>
                 <!--TODO na mpei ena tab me diafora search-->
-                <fieldset>
-                    <legend class="legend_text">Based on Dates</legend>
-                    <span>Date from: <input type="text" id="datepickerfrom" size="11"></span>
-                    <span>Date before: <input type="text" id="datepickerbefore" size="11"></span><br>
-                    <button type="button" class="btn btn-default btn_style"  
-                            onclick="">
-                        Search now
-                    </button>
-                </fieldset>
+
+                <legend class="legend_text">Transaction complex search</legend>
+                <span>Date from: <input type="date" id="datepickerfrom" size="11"></span>
+                <span>Date before: <input type="date" id="datepickerbefore" size="11"></span><br>
+                <button type="button" class="btn btn-default btn_style"  
+                        onclick="">
+                    Search now
+                </button>
+
             </form>
         </div>
     </div>

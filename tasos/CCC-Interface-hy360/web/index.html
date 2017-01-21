@@ -31,6 +31,13 @@ and open the template in the editor.
         <link href="CSS/index.css" rel="stylesheet" type="text/css"/>
     </head>
     <body onload="ajaxLoginRequest()">
+        <script>
+            $(function () {
+                $("#datepickerfrom").datepicker();
+            });
+            $(function () {
+                $("#datepickerbefore").datepicker();
+            });</script>
         <!--Header-->
         <div id="header" class="container">
             <div class="page-header">
