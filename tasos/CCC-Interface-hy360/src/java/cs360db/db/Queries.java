@@ -173,12 +173,11 @@ public class Queries {
 
     public static String getBadCustomers() {//fix
         StringBuilder insQuery = new StringBuilder();
-        insQuery.append(" SELECT ID FROM (")
-                .append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
+        insQuery.append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
                 .append(" UNION")
                 .append(" SELECT ID,Debt FROM merchant WHERE Debt <> 0")
                 .append(" UNION")
-                .append(" SELECT ID,Debt FROM company WHERE Debt <> 0) as x")
+                .append(" SELECT ID,Debt FROM company WHERE Debt <> 0")
                 .append(" ORDER BY debt");
         return insQuery.toString();
     }

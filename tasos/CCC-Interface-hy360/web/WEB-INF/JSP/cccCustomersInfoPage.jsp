@@ -9,8 +9,8 @@
     int goodCnt = 1;
     context.removeAttribute("good"); // clear after use
 
-    assert (context.getAttribute("bad") instanceof HashMap);
-    HashMap<String, Double> bad = (HashMap) context.getAttribute("bad");
+    assert (context.getAttribute("bad") instanceof ArrayList);
+    ArrayList<String> bad = (ArrayList) context.getAttribute("bad");
     int badCnt = 1;
     context.removeAttribute("bad"); // clear after use
 
@@ -63,14 +63,20 @@
         <tbody>
             <%
                 if (!bad.isEmpty()) {
-                    for (String id : bad.keySet()) {
-            %>
+                    String userID = null;
+                    for (String id : bad) {
+                        if (userID == null) {
+                            userID = id;
+                        } else {%>
             <tr>
                 <td class="text-right"><%= badCnt%></td>
+                <td><%= userID%></td>
                 <td><%= id%></td>
-                <td><%= bad.get(id)%></td>
             </tr>
-            <%badCnt++;
+            <%
+                        userID = null;
+                        badCnt++;
+                    }
                 }
             } else {%>
             <tr>

@@ -69,15 +69,15 @@ public class dbAPI {
     }
 
     public static ArrayList<String> getGoodCustomers() throws ClassNotFoundException {
-        return UserDB.getArrayWithID(Queries.getGoodCustomers());
+        return UserDB.getArray(Queries.getGoodCustomers());
     }
 
-    public static Map<String, Double> getBadCustomers() throws ClassNotFoundException {
-        return UserDB.getMapWithIdDebt(Queries.getBadCustomers());
+    public static ArrayList<String> getBadCustomers() throws ClassNotFoundException {
+        return UserDB.getArray(Queries.getBadCustomers());
     }
 
     public static ArrayList<String> getMonthMerchants() throws ClassNotFoundException {
-        return UserDB.getArrayWithID(Queries.getMonthMerchants());
+        return UserDB.getArray(Queries.getMonthMerchants());
     }
 
     public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
