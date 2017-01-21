@@ -62,7 +62,7 @@
             <%}%>
         <li><a data-toggle="tab" href="#refund" class="darkcolor"
                onclick="ajaxMerchantsDropdownRequest('refund')">Refund </a></li >
-    <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
+        <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>
 
     <div class="tab-content">

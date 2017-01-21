@@ -13,13 +13,13 @@ public class AccountNumberGenerator {
 
     /**
      * Generates a random valid credit card number.
-     * @param bin
-     *            The bank identification number, a set digits at the start of the credit card
-     *            number, used to identify the bank that is issuing the credit card.
-     * @param length
-     *            The total length (i.e. including the BIN) of the credit card number.
-     * @return
-     *            A randomly generated, valid, credit card number.
+     *
+     * @param bin The bank identification number, a set digits at the start of
+     * the credit card number, used to identify the bank that is issuing the
+     * credit card.
+     * @param length The total length (i.e. including the BIN) of the credit
+     * card number.
+     * @return A randomly generated, valid, credit card number.
      */
     public String generate(String bin, int length) {
 
@@ -45,10 +45,10 @@ public class AccountNumberGenerator {
      * Generates the check digit required to make the given credit card number
      * valid (i.e. pass the Luhn check)
      *
-     * @param number
-     *            The credit card number for which to generate the check digit.
+     * @param number The credit card number for which to generate the check
+     * digit.
      * @return The check digit required to make the given credit card number
-     *         valid.
+     * valid.
      */
     private int getCheckDigit(String number) {
 

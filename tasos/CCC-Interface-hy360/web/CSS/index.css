@@ -169,11 +169,11 @@ legend{
 }
 
 input:invalid {
-  border: 1px solid red;
+    border: 1px solid red;
 }
 
 input:valid {
-  border: 1px solid green;
+    border: 1px solid green;
 }
 /*============================================================================*/
 

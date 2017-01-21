@@ -51,7 +51,7 @@ public class Cookies {
 
         return servletCookies.get(key);
     }
-    
+
     public static String getCookieType(String cookie) {
         if (cookie == null) {
             return null;

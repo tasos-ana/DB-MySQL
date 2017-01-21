@@ -138,14 +138,23 @@ public class Queries {
         return insQuery.toString();
     }
 
-    public static String getAllMerchants2Refund(String civilianID) {
+    public static String getAllMerchants2Refund(String civilianID, String table) {
         StringBuilder insQuery = new StringBuilder();
-
-        insQuery.append(" SELECT employee_merchant_id AS ID FROM emerchant_transaction_civilian")
-                .append(" WHERE Civilian_id = '").append(civilianID).append("'")
+        String t1, t2, t3, t4, civilian;
+        if (table.contains("employee")) {
+            t1 = "emerchant_transaction_ecivilian";
+            t2 = "merchant_transaction_ecivilian";
+            civilian = "employee_Civilian_id";
+        } else {
+            t1 = "emerchant_transaction_civilian";
+            t2 = "merchant_transaction_civilian";
+            civilian = "Civilian_id";
+        }
+        insQuery.append(" SELECT employee_merchant_id AS ID FROM ").append(t1)
+                .append(" WHERE ").append(civilian).append(" = '").append(civilianID).append("'")
                 .append(" UNION")
-                .append(" SELECT merchant_id AS ID FROM merchant_transaction_civilian")
-                .append(" WHERE Civilian_id = '").append(civilianID).append("'");
+                .append(" SELECT merchant_id AS ID FROM ").append(t2)
+                .append(" WHERE ").append(civilian).append(" = '").append(civilianID).append("'");
 
         return insQuery.toString();
     }
@@ -164,7 +173,7 @@ public class Queries {
                 .append(" WHERE")
                 .append(" ID = '").append(civilianID).append("'")
                 .append(" AND Debt >= ").append(value)
-                .append(" AND Valid_thru > '").append(currDate).append("'");
+                .append(" AND Valid_thru >= '").append(currDate).append("'");
 
         return insQuery.toString();
     }
@@ -179,7 +188,7 @@ public class Queries {
                 .append(" + ").append(value).append("*Commission/100")
                 .append(" WHERE ")
                 .append(" ID = '").append(merchantID).append("'")
-                .append(" AND Total_profit > ").append(value);
+                .append(" AND Total_profit >= ").append(value);
 
         return insQuery.toString();
     }
@@ -198,8 +207,8 @@ public class Queries {
                 .append(" , Debt = Debt + ").append(value)
                 .append(" WHERE ")
                 .append(" ID = '").append(civilianID).append("'")
-                .append(" AND Credit_balance > ").append(value)
-                .append(" AND Valid_thru > '").append(currDate).append("'");
+                .append(" AND Credit_balance >= ").append(value)
+                .append(" AND Valid_thru >= '").append(currDate).append("'");
 
         return insQuery.toString();
     }
