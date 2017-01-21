@@ -12,8 +12,6 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -166,6 +164,56 @@ class UserDB {
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return merchantsIDs;
+    }
+
+    protected static ArrayList<String> getCompanyEmployee(String email) throws ClassNotFoundException {
+        ArrayList<String> employeeIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getAllCompanyEmployee(email);
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                employeeIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return employeeIDs;
+    }
+
+    protected static ArrayList<String> getCoopedCivilian(String email, String type) throws ClassNotFoundException {
+        ArrayList<String> civilianIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getAllCoopedCivilian(email, type);
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                civilianIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return civilianIDs;
     }
 
     protected static ArrayList<String> getArray(String insQuery) throws ClassNotFoundException {
@@ -504,4 +552,49 @@ class UserDB {
         }
         return exist;
     }
+
+    protected static ArrayList<ArrayList<String>> getSearchResults(String insQuery) throws ClassNotFoundException {
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+
+                stmt.execute(insQuery);
+                ResultSet res = stmt.getResultSet();
+                int i = 1;
+                ArrayList<String> tmp = new ArrayList<>();
+                try {
+                    while (res.getString(i) != null) {
+                        tmp.add(res.getString(i));
+                        i++;
+                    }
+                } catch (SQLException e) {
+                }
+
+                while (res.next() == true) {
+                    tmp = new ArrayList<>();
+                    i = 1;
+                    try {
+                        while (res.getString(i) != null) {
+                            tmp.add(res.getString(i));
+                            i++;
+                        }
+                    } catch (SQLException ex) {
+                    }
+                    data.add(tmp);
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return data;
+    }
+
 }

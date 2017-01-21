@@ -416,4 +416,36 @@ public class Queries {
 
         return insQuery.toString();
     }
+
+    static String getAllCompanyEmployee(String companyID) {
+        StringBuilder insQuery = new StringBuilder();
+        insQuery.append(" SELECT id FROM employee_civiliean")
+                .append(" WHERE company_id = '").append(companyID).append("'")
+                .append(" UNION")
+                .append(" SELECT id FROM employee_merchant")
+                .append(" WHERE company_id = '").append(companyID).append("'");
+
+        return insQuery.toString();
+    }
+
+    static String getAllCoopedCivilian(String email, String type) {
+        StringBuilder insQuery = new StringBuilder();
+
+        if (type.contains("employee")) {
+            insQuery.append(" SELECT employee_civilian_id as ID from emerchant_transaction_ecivilian")
+                    .append(" WHERE employee_merchant_id = '").append(email).append("'")
+                    .append(" UNION")
+                    .append(" SELECT civilian_id from emerchant_transaction_civilian")
+                    .append(" WHERE employee_merchant_id = '").append(email).append("'");
+        } else {
+            insQuery.append(" SELECT employee_civilian_id as ID from merchant_transaction_ecivilian")
+                    .append(" WHERE merchant_id = '").append(email).append("'")
+                    .append(" UNION")
+                    .append(" SELECT civilian_id from merchant_transaction_civilian")
+                    .append(" WHERE merchant_id = '").append(email).append("'");
+        }
+
+        return insQuery.toString();
+    }
+
 }

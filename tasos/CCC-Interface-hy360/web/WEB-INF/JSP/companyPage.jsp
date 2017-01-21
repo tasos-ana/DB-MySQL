@@ -36,7 +36,8 @@
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Add employee</a></li>
-        <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
+        <li><a data-toggle="tab" href="#searchTab" class="darkcolor" 
+               onclick="ajaxSearchRequest(); ajaxUsersDropdownRequest('searchCompany')">Search</a></li>
     </ul>
 
     <div class="tab-content">
@@ -142,8 +143,10 @@
                 </div>
             </form>
         </div>
-        <div id="search" class="tab-pane fade">
-
+        <div id="searchTab" class="tab-pane fade">
+            <div id="searchResults"></div>
+            <div id="search">
+            </div>
         </div>
     </div>
     <div class="row" id="cccCustomersInfoContainer"></div>

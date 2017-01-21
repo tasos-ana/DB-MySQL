@@ -68,6 +68,10 @@ public class dbAPI {
         return UserDB.getRefundMerchants(email, type);
     }
 
+    public static ArrayList<String> getCompanyEmployee(String email) throws ClassNotFoundException {
+        return UserDB.getCompanyEmployee(email);
+    }
+
     public static ArrayList<String> getGoodCustomers() throws ClassNotFoundException {
         return UserDB.getArray(Queries.getGoodCustomers());
     }
@@ -149,5 +153,13 @@ public class dbAPI {
             state = true;
         }
         return state;
+    }
+
+    public static ArrayList<ArrayList<String>> getSearchResults(String insQuery) throws ClassNotFoundException {
+        return UserDB.getSearchResults(insQuery);
+    }
+
+    public static ArrayList<String> getCoopedCivilian(String id, String type) throws ClassNotFoundException {
+        return UserDB.getCoopedCivilian(id, type);
     }
 }

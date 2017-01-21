@@ -77,11 +77,20 @@ public class CompanyServlet extends HttpServlet {
                 case "checkEmployee":
                     checkEmployeeAction(request, response);
                     break;
-                case "buyMerchantDropdown":
-                    buyMerchantDropdownAction(request, response);
+                case "buyUserDropdown":
+                    buyUserDropdownAction(request, response);
                     break;
-                case "refundMerchantDropdown":
-                    refundMerchantDropdownAction(request, response);
+                case "refundUserDropdown":
+                    refundUserDropdownAction(request, response);
+                    break;
+                case "searchUserDropdown":
+                    searchUserDropdownAction(request, response);
+                    break;
+                case "searchCompanyUserDropdown":
+                    searchCompanyUserDropdown(request, response);
+                    break;
+                case "searchCivilianUserDropdown":
+                    searchCivilianUserDropdown(request, response);
                     break;
                 case "makeTransaction":
                     makeTranstacionAction(request, response);
@@ -91,6 +100,12 @@ public class CompanyServlet extends HttpServlet {
                     break;
                 case "cccCustomerInfo":
                     cccCustomerInfoAction(request, response);
+                    break;
+                case "adminPage":
+                    adminPageAction(request, response);
+                    break;
+                case "executeSearch":
+                    executeSearchAction(request, response);
                     break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
@@ -111,12 +126,18 @@ public class CompanyServlet extends HttpServlet {
                 response.setHeader("id", "Hello, " + email);
                 response.setHeader("dataEmail", email);
                 response.setHeader("dataType", type);
-                StringBuilder url = new StringBuilder();
-                url.append("/WEB-INF/JSP/").append(convertType2Page(type));
-                ServletContext context = getServletContext();
-                context.setAttribute("data", dbAPI.getUser(email, type));
-                context.setAttribute("dataType", type);
-                forwardToPage(request, response, url.toString());
+                if (email.equals("admin@ccc.gr")) {
+                    StringBuilder url = new StringBuilder();
+                    url.append("/WEB-INF/JSP/").append("adminPage.jsp");
+                    forwardToPage(request, response, url.toString());
+                } else {
+                    StringBuilder url = new StringBuilder();
+                    url.append("/WEB-INF/JSP/").append(convertType2Page(type));
+                    ServletContext context = getServletContext();
+                    context.setAttribute("data", dbAPI.getUser(email, type));
+                    context.setAttribute("dataType", type);
+                    forwardToPage(request, response, url.toString());
+                }
             }
         } else {
             boolean exists = dbAPI.existID(email, type);
@@ -138,6 +159,19 @@ public class CompanyServlet extends HttpServlet {
                 forwardToPage(request, response, url.toString());
             }
         }
+    }
+
+    private void adminPageAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setHeader("id", "Hello, " + "admin@ccc.gr");
+        response.setHeader("dataEmail", "admin@ccc.gr");
+        response.setHeader("dataType", "admin");
+        Cookie usrCookie = new Cookie("cccCompanyServlet", "" + Cookies.addCookie("admin@ccc.gr", "admin"));//create and set cookies
+        usrCookie.setMaxAge(3600);
+        response.addCookie(usrCookie);
+
+        StringBuilder url = new StringBuilder();
+        url.append("/WEB-INF/JSP/").append("adminPage.jsp");
+        forwardToPage(request, response, url.toString());
     }
 
     private void openAction(HttpServletRequest request, HttpServletResponse response)
@@ -257,36 +291,76 @@ public class CompanyServlet extends HttpServlet {
         }
     }
 
-    private void buyMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
+    private void buyUserDropdownAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException {
         StringBuilder url = new StringBuilder();
 
         response.setHeader("container", "buyMerchantsDropdownContainer");
-        url.append("/WEB-INF/JSP/merchantDropdownPage.jsp");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("data", dbAPI.getBuyMerchants());
         forwardToPage(request, response, url.toString());
     }
 
-    private void refundMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
+    private void refundUserDropdownAction(HttpServletRequest request, HttpServletResponse response)
             throws ClassNotFoundException, IOException, ServletException {
-        
+
         StringBuilder url = new StringBuilder();
         String id, type;
         id = request.getParameter("userID");
         type = request.getParameter("userType");
         response.setHeader("container", "refundMerchantsDropdownContainer");
-        url.append("/WEB-INF/JSP/merchantDropdownPage.jsp");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("data", dbAPI.getRefundMerchants(id, type));
         forwardToPage(request, response, url.toString());
     }
 
+    private void searchUserDropdownAction(HttpServletRequest request, HttpServletResponse response)
+            throws ClassNotFoundException, IOException, ServletException {
+
+        StringBuilder url = new StringBuilder();
+        String id, type;
+        id = request.getParameter("userID");
+        type = request.getParameter("userType");
+        response.setHeader("container", "field1Value");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getRefundMerchants(id, type));
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void searchCompanyUserDropdown(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ClassNotFoundException {
+        StringBuilder url = new StringBuilder();
+        String id;
+        id = request.getParameter("userID");
+        response.setHeader("container", "field1Value");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getCompanyEmployee(id));
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void searchCivilianUserDropdown(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ClassNotFoundException {
+        StringBuilder url = new StringBuilder();
+        String id, type;
+        type = request.getParameter("userType");
+        id = request.getParameter("userID");
+        response.setHeader("container", "field1Value");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getCoopedCivilian(id, type));
+        forwardToPage(request, response, url.toString());
+    }
+
     private void cccCustomerInfoAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException {
-        
+
         StringBuilder url = new StringBuilder();
         response.setHeader("container", "cccCustomersInfoContainer");
         url.append("/WEB-INF/JSP/cccCustomersInfoPage.jsp");
@@ -328,6 +402,14 @@ public class CompanyServlet extends HttpServlet {
             response.setHeader("error", "Something goes wrong. "
                     + "Make sure that you have enough balance");
         }
+    }
+
+    private void executeSearchAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ClassNotFoundException {
+        String insQuery = request.getParameter("insQuery");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("result", dbAPI.getSearchResults(insQuery));
+        forwardToPage(request, response, "/WEB-INF/JSP/exportResults.jsp");
     }
 
     private void forwardToPage(HttpServletRequest request,

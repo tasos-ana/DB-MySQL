@@ -90,7 +90,7 @@
     </table>
 </div>
 <div class="form-group col-sm-4">
-    <labe for="monthMerchant">Merchant of the previous month</labe>
+    <labe for="monthMerchant">Best Merchant of the previous month</labe>
     <table class="table table-hover text-left table-responsive" id="monthMerchant">
         <thead>
             <tr>
@@ -104,7 +104,7 @@
                     for (String id : month) {
             %>
             <tr>
-                <td class="text-right"><%= monthCnt%></td>
+                <td class="text-right" id="bestMerchant<%=monthCnt%>"><%= monthCnt%></td>
                 <td><%= id%></td>
             </tr>
             <%monthCnt++;

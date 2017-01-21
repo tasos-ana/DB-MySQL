@@ -42,30 +42,37 @@ function ajaxLoginRequest() {
         }
     };
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', 'login');
+
     type = document.getElementById("user_account_type");
     pagePrepare();
     if (email === null && type === null) {
+        xhr.setRequestHeader('action', 'login');
         xhr.send();
     } else {
-        if (!document.getElementById("login_form").checkValidity()) {
-            document.getElementById("usr_login_error").innerHTML = "Invalid email";
-            document.getElementById("usr_login_error").style.color = "red";
-            pageReady();
+        if (email.value === "admin@ccc.gr") {
+            xhr.setRequestHeader('action', 'adminPage');
+            xhr.send();
         } else {
-            works = document.login.employee;
-            if (type.value !== "company") {
-                if (works.value === "yes") {
-                    newType = "employee_" + type.value;
+            xhr.setRequestHeader('action', 'login');
+            if (!document.getElementById("login_form").checkValidity()) {
+                document.getElementById("usr_login_error").innerHTML = "Invalid email";
+                document.getElementById("usr_login_error").style.color = "red";
+                pageReady();
+            } else {
+                works = document.login.employee;
+                if (type.value !== "company") {
+                    if (works.value === "yes") {
+                        newType = "employee_" + type.value;
+                    } else {
+                        newType = type.value;
+                    }
                 } else {
                     newType = type.value;
                 }
-            } else {
-                newType = type.value;
+                document.getElementById("main_container").setAttribute("data-type", newType);
+                document.getElementById("main_container").setAttribute("data-userID", email.value);
+                xhr.send('email=' + email.value + '&type=' + newType);
             }
-            document.getElementById("main_container").setAttribute("data-type", newType);
-            document.getElementById("main_container").setAttribute("data-userID", email.value);
-            xhr.send('email=' + email.value + '&type=' + newType);
         }
     }
 }
@@ -233,7 +240,7 @@ function ajaxEmployeeAction() {
     }
 }
 
-function ajaxMerchantsDropdownRequest(content) {
+function ajaxUsersDropdownRequest(content) {
     var xhr, userID, userType;
     xhr = new XMLHttpRequest();
     userID = getUserID();
@@ -256,12 +263,48 @@ function ajaxMerchantsDropdownRequest(content) {
         }
     };
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', content + 'MerchantDropdown');
-    if (content === "refund") {
+    xhr.setRequestHeader('action', content + 'UserDropdown');
+    if (content === "refund" || content === "search" || content === "searchCompany"
+            || content === "searchCivilian") {
         xhr.send("userID=" + userID + "&userType=" + userType);
     } else {
         xhr.send();
     }
+}
+
+function ajaxSearchRequest() {
+    var xhr, userType, searchPage;
+    xhr = new XMLHttpRequest();
+    userType = getAccountType();
+    var type = userType.split("_");
+    if (type[0] === "employee") {
+        if (type[1] === "civilianSearch") {
+            searchPage = "eCivilianSearch";
+        } else {
+            searchPage = "merchantSearch";
+        }
+    } else {
+        searchPage = userType + "Search";
+    }
+    xhr.open('POST', 'requestPagesServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    document.getElementById("search").innerHTML = xhr.responseText;
+                }
+            }
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send("page=" + searchPage);
 }
 
 function ajaxCccCustomerInfoRequest() {
@@ -287,7 +330,7 @@ function ajaxCccCustomerInfoRequest() {
         }
     };
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action','cccCustomerInfo');
+    xhr.setRequestHeader('action', 'cccCustomerInfo');
     xhr.send();
 }
 
@@ -350,7 +393,6 @@ function ajaxPayDebtRequest() {
         var xhr, civilianID, civilianType;
         civilianID = getUserID();
         civilianType = getAccountType();
-
         xhr = new XMLHttpRequest();
         xhr.open('POST', 'CompanyServlet');
         xhr.onload = function () {
@@ -372,6 +414,119 @@ function ajaxPayDebtRequest() {
         xhr.send("userID=" + civilianID + "&userType=" + civilianType +
                 "&value=" + value);
     }
+}
+
+function ajaxSearchExecuteRequest() {
+    var query;
+    var xhr, userID, userType;
+    userID = getUserID();
+    userType = getAccountType();
+
+    var table1, table2, merchantID1, civilianID1, merchantID2, civilianID2, compareID, thisID;
+    if (userType.split("_")[0] === "employee") {
+        if (userType.split("_")[1] === "civilian") {
+            table1 = "emerchant_transaction_ecivilian";
+            merchantID1 = "employee_merchant_id";
+            civilianID1 = "employee_civilian_id";
+            table2 = "merchant_transaction_ecivilian";
+            merchantID2 = "merchant_id";
+            civilianID2 = civilianID1;
+            compareID = "merchantID";
+            thisID = "civilianID";
+        } else {
+            table1 = "emerchant_transaction_ecivilian";
+            merchantID1 = "employee_merchant_id";
+            civilianID1 = "employee_civilian_id";
+            table2 = "emerchant_transaction_civilian";
+            merchantID2 = merchantID1;
+            civilianID2 = "civilian_id";
+            compareID = "civilianID";
+            thisID = "merchantID";
+        }
+    } else {
+        switch (userType.split("_")[0]) {
+            case "civilian":
+                table1 = "emerchant_transaction_civilian";
+                merchantID1 = "employee_merchant_id";
+                civilianID1 = "civilian_id";
+                table2 = "merchant_transaction_civilian";
+                merchantID2 = "merchant_id";
+                civilianID2 = civilianID1;
+                compareID = "merchantID";
+                thisID = "civilianID";
+                break;
+            case "merchant":
+                table1 = "merchant_transaction_ecivilian";
+                merchantID1 = "merchant_id";
+                civilianID1 = "employee_civilian_id";
+                table2 = "merchant_transaction_civilian";
+                merchantID2 = merchantID1;
+                civilianID2 = "civilian_id";
+                compareID = "civilianID";
+                thisID = "merchantID";
+                break;
+            case "company":
+                window.alert("assert ajaxReqeust.js ~line 460");
+                break;
+            default:
+                window.alert("assert ajaxReqeust.js ~line 463");
+        }
+    }
+
+    query = " SELECT * FROM (SELECT " + merchantID1 + " as merchantID, ";
+    query = query + civilianID1 + " as civilianID, value, type, date FROM " + table1;
+    query = query + " UNION ";
+    query = query + "SELECT " + merchantID2 + " as merchantID, ";
+    query = query + civilianID2 + " as civilianID, value, type, date FROM " + table2 + ") a";
+    query = query + " WHERE 1=1 AND " + thisID + "= '" + userID + "'";
+
+    var field1Query, field2Query, field3Query, field4Query = null, field5Query = null;
+    field1Query = " AND " + compareID + " = '" + document.getElementById("field1Value").value + "' ";
+    field2Query = " AND type = '" + document.getElementById("field2Value").value + "' ";
+    field3Query = " AND value " + document.getElementById("field3Operation").value + " " + document.getElementById("field3Value").value;
+
+    if (document.getElementById("field4Value1").value !== "" && document.getElementById("field4Value2").value !== "") {
+        field4Query = " AND value BETWEEN '" + document.getElementById("field4Value1").value + "' AND '" + document.getElementById("field4Value2").value + "'";
+    }
+
+    if (document.getElementById("field5Value1").value !== "" && document.getElementById("field5Value2").value !== "") {
+        field5Query = " AND date BETWEEN '" + document.getElementById("field5Value1").value + "' AND '" + document.getElementById("field5Value2").value + "'";
+    }
+
+    if (!field1Query.includes("default")) {
+        query = query + field1Query;
+    }
+    if (!field2Query.includes("default")) {
+        query = query + field2Query;
+    }
+    if (!field3Query.includes("default") && document.getElementById("field3Value").value !== "") {
+        query = query + field3Query;
+    }
+    if (field4Query !== null) {
+        query = query + field4Query;
+    }
+    if (field5Query !== null) {
+        query = query + field5Query;
+    }
+
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (xhr.getResponseHeader("error") !== null) {
+                window.alert(xhr.getResponseHeader("error"));
+            } else {
+                document.getElementById("searchResults").innerHTML = xhr.responseText;
+            }
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+        pageReady();
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader("action", "executeSearch");
+    pagePrepare();
+    xhr.send("insQuery=" + query);
 }
 
 function setWelcomeMessage(email) {
