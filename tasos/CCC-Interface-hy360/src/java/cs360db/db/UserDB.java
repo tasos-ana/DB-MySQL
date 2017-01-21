@@ -369,17 +369,16 @@ class UserDB {
     }
 
     private static User exportECivilian(ResultSet res) throws SQLException, ParseException {
-        assert (res.getString(3).equals(res.getString(11)));
+        assert (res.getString(3).equals(res.getString(10)));
         //Civilian export
         String Name = res.getString(1);
         String ID = res.getString(2);
-        double debt = Double.parseDouble(res.getString(4));
-        Civilian employee = new Civilian(ID, Name, debt);
+        Civilian employee = new Civilian(ID, Name, "employee_civilian");
 
         //Company export
-        Name = res.getString(5);
-        ID = res.getString(11);
-        debt = Double.parseDouble(res.getString(6));
+        Name = res.getString(4);
+        ID = res.getString(10);
+        double debt = Double.parseDouble(res.getString("Debt"));
         double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
         double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
         int accountNumber = Integer.parseInt(res.getString("Account_number"));

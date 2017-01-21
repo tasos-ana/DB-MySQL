@@ -39,16 +39,11 @@ public class Civilian {
             this.validThru = null;
             this.creditLimit = -1;
             this.creditBalance = -1;
+            this.debt = -1;
         } else {
             initAccountNumber();
             initValidThru();
         }
-    }
-
-    public Civilian(String id, String name, double debt) {
-        this.id = id;
-        this.name = name;
-        this.debt = debt;
     }
 
     public Civilian(String name, double debt, double creditBalance, double creditLimit, int accountNumber, Date validThru, String id) {
@@ -119,7 +114,8 @@ public class Civilian {
 
     public boolean isValidEmployee() {
         return (this.accountNumber == -1 && this.validThru == null
-                && this.creditLimit == -1 && this.creditBalance == -1);
+                && this.creditLimit == -1 && this.creditBalance == -1 && 
+                this.debt == -1);
     }
 
     /**

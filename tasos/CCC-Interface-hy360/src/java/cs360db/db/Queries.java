@@ -142,28 +142,17 @@ public class Queries {
             String table, double value, Date currDate) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
         if (table.contains("employee")) {
-            String companyID = UserDB.getCompany(civilianID, table);
-            insQuery.append(" UPDATE company co, ").append(table).append(" ec")
-                    .append(" SET")
-                    .append(" co.Credit_balance = co.Credit_balance + ").append(value)
-                    .append(" , ec.Debt = ec.Debt - ").append(value)
-                    .append(" , co.Debt = co.Debt - ").append(value)
-                    .append(" WHERE")
-                    .append(" ec.ID = '").append(civilianID).append("'")
-                    .append(" AND co.ID = '").append(companyID).append("'")
-                    .append(" AND co.Debt > ").append(value)
-                    .append(" AND ec.Debt > ").append(value)
-                    .append(" AND co.Valid_thru > '").append(currDate).append("'");
-        } else {
-            insQuery.append(" UPDATE ").append(table)
-                    .append(" SET")
-                    .append(" Credit_balance = Credit_balance + ").append(value)
-                    .append(" , Debt = Debt - ").append(value)
-                    .append(" WHERE")
-                    .append(" ID = '").append(civilianID).append("'")
-                    .append(" AND Debt > ").append(value)
-                    .append(" AND Valid_thru > '").append(currDate).append("'");
+            civilianID = UserDB.getCompany(civilianID, table);
+            table = "company";
         }
+        insQuery.append(" UPDATE ").append(table)
+                .append(" SET")
+                .append(" Credit_balance = Credit_balance + ").append(value)
+                .append(" , Debt = Debt - ").append(value)
+                .append(" WHERE")
+                .append(" ID = '").append(civilianID).append("'")
+                .append(" AND Debt > ").append(value)
+                .append(" AND Valid_thru > '").append(currDate).append("'");
 
         return insQuery.toString();
     }
@@ -187,27 +176,18 @@ public class Queries {
             String table, double value, Date currDate) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
         if (table.contains("employee")) {
-            String companyID = UserDB.getCompany(civilianID, table);
-            insQuery.append(" UPDATE company co").append(table).append(" ec")
-                    .append(" SET")
-                    .append(" co.Credit_balance = co.Credit_balance - ").append(value)
-                    .append(" , co.Debt = co.Debt + ").append(value)
-                    .append(" , ec.Debt = ec.Debt + ").append(value)
-                    .append(" WHERE ")
-                    .append(" ec.ID = '").append(civilianID).append("'")
-                    .append(" AND co.ID = '").append(companyID).append("'")
-                    .append(" AND co.Credit_balance > ").append(value)
-                    .append(" AND co.Valid_thru > '").append(currDate).append("'");
-        } else {
-            insQuery.append(" UPDATE ").append(table)
-                    .append(" SET")
-                    .append(" Credit_balance = Credit_balance - ").append(value)
-                    .append(" , Debt = Debt + ").append(value)
-                    .append(" WHERE ")
-                    .append(" ID = '").append(civilianID).append("'")
-                    .append(" AND Credit_balance > ").append(value)
-                    .append(" AND Valid_thru > '").append(currDate).append("'");
+            civilianID = UserDB.getCompany(civilianID, table);
+            table = "company";
         }
+
+        insQuery.append(" UPDATE ").append(table)
+                .append(" SET")
+                .append(" Credit_balance = Credit_balance - ").append(value)
+                .append(" , Debt = Debt + ").append(value)
+                .append(" WHERE ")
+                .append(" ID = '").append(civilianID).append("'")
+                .append(" AND Credit_balance > ").append(value)
+                .append(" AND Valid_thru > '").append(currDate).append("'");
 
         return insQuery.toString();
     }
@@ -333,58 +313,67 @@ public class Queries {
 
         return insQuery.toString();
     }
-    /*
-    static String payDebtEmployeeMerchant(String userID, String table, double value) throws ClassNotFoundException {
+
+    static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
-        String companyID = UserDB.getCompany(userID, table);
+        String companyID = UserDB.getCompany(merchantID, table);
         insQuery.append(" UPDATE company co, ").append(table).append(" em")
                 .append(" SET")
-                .append(" co.Debt = co.Debt + ").append(value).append("*em.Commission/100")
-                .append(" , em.Total_profit = em.Total_profit + ").append(value)
+                .append(" co.Debt = co.Debt - ").append(value)
+                .append(" , co.Credit_balance = co.Credit_balance + ").append(value)
+                .append(" , em.Debt = em.Debt - ").append(value)
+                .append(" , em.Total_profit = em.Total_profit - ").append(value)
                 .append(" WHERE")
                 .append(" co.ID = '").append(companyID).append("'")
-                .append(" AND em.ID = '").append(merchantID).append("'");
+                .append(" AND em.ID = '").append(merchantID).append("'")
+                .append(" AND co.Debt > ").append(value)
+                .append(" AND em.Debt > ").append(value)
+                .append(" AND em.Total_profit > ").append(value);
 
         return insQuery.toString();
     }
 
-    static String payDebtEmployeeCivilian(String userID, String table, double value) {
+    static String payDebtEmployeeCivilian(String civilianID, String table, double value) throws ClassNotFoundException {
+        StringBuilder insQuery = new StringBuilder();
+//        String companyID = UserDB.getCompany(civilianID, table);
+//        insQuery.append(" UPDATE company co, ").append(table).append(" ec")
+//                .append(" SET")
+//                .append(" Total_profit = Total_profit + ").append(value)
+//                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
+//                .append(" WHERE ")
+//                .append(" ID = '").append(civilianID).append("'");
+
+        return insQuery.toString();
+    }
+
+    static String payDebtMerchant(String merchantID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
                 .append(" SET")
-                .append(" Total_profit = Total_profit + ").append(value)
-                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
+                .append(" Total_profit = Total_profit - ").append(value)
+                .append(" , Debt = Debt - ").append(value)
                 .append(" WHERE ")
-                .append(" ID = '").append(merchantID).append("'");
+                .append(" ID = '").append(merchantID).append("'")
+                .append(" AND Debt > ").append(value)
+                .append(" AND Total_profit > ").append(value);
 
         return insQuery.toString();
     }
 
-    static String payDebtMerchant(String userID, String table, double value) {
+    static String payDebtCivilian(String civilianID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
                 .append(" SET")
-                .append(" Total_profit = Total_profit + ").append(value)
-                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
+                .append(" Credit_balance = Credit_balance + ").append(value)
+                .append(" , Debt = Debt - ").append(value)
                 .append(" WHERE ")
-                .append(" ID = '").append(merchantID).append("'");
+                .append(" ID = '").append(civilianID).append("'")
+                .append(" AND Credit_limit <= Credit_balance + ").append(value)
+                .append(" AND Debt > ").append(value);
 
         return insQuery.toString();
     }
 
-    static String payDebtCivilian(String userID, String table, double value) {
-        StringBuilder insQuery = new StringBuilder();
-
-        insQuery.append(" UPDATE ").append(table)
-                .append(" SET")
-                .append(" Total_profit = Total_profit + ").append(value)
-                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
-                .append(" WHERE ")
-                .append(" ID = '").append(merchantID).append("'");
-
-        return insQuery.toString();
-    }
-     */
 }
