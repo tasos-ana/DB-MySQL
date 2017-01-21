@@ -311,7 +311,7 @@ function ajaxPayDebtRequest() {
                 if (xhr.getResponseHeader("error") !== null) {
                     window.alert(xhr.getResponseHeader("error"));
                 } else {
-                    window.alert("Succeed debt payoff");
+                    window.alert("Succeed payoff");
                     document.getElementById("home_link").click();
                 }
             } else if (xhr.status !== 200) {

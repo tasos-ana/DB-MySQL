@@ -101,11 +101,13 @@
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
-                    <span><input type="text" class="text-center" id="debt_amount" size="30" readonly value="<%= debt%>">&#8364</span>
+                    <span><input type="text" class="text-center" id="debt_amount"
+                                 size="30" readonly value="<%= debt%>">&#8364</span>
                     <div class="title_text">Payoff:</div>
-                    <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
+                    <input type="text" class="text-center" id="payDebt"
+                           placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
-                            onclick="">
+                            onclick="ajaxPayDebtRequest()">
                         Pay now
                     </button>
                 </fieldset>
