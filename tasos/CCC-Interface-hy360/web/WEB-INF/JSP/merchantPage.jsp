@@ -30,13 +30,13 @@
         accountNumber = c.getAccountNumber();
     } else {
         Company c = user.getCompany();
-        Merchant m = user.getMerchant();
+        Merchant m = user.getEmployeeMerchant();
+        debt = m.getDebt();
         name = m.getName();
         commission = m.getCommission();
         totalProfit = m.getTotalProfit();
         companyId = c.getId();
         companyName = c.getName();
-        debt = c.getDebt();
         accountNumber = c.getAccountNumber();
     }
 %>
@@ -89,7 +89,7 @@
                                 <td id="cardHolder"><%= name%></td>
                                 <td><span id="totalProfit"><%= totalProfit%></span> &#8364</td>
                                 <td><span id="debtValue"><%= debt%></span> &#8364</td>
-                                <td><span id="supply"><%= commission%></span> &#8364</td>
+                                <td><span id="supply"><%= commission%></span>%</td>
                             </tr>
                         </tbody>
                     </table>

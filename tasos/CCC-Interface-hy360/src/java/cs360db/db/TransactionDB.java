@@ -40,10 +40,40 @@ public class TransactionDB {
                     merchantID, civilianID, transID, value, transType, table, currDate);
         }
 
+        executeSingleQuery(insQuery);
+    }
+
+    public static boolean payDebt(String userID, String userType, double value) throws ClassNotFoundException {
+        boolean succeed = false, merchant, civilian, employee;
+        int retVal = 0;
+        String insQuery;
+        merchant = userType.contains("merchant");
+        civilian = userType.contains("civilian");
+        employee = userType.contains("employee");
+
+        if (employee && merchant) {
+            //insQuery = Queries.payDebtEmployeeMerchant(userID, userType, value);
+        } else if (employee) {
+            //insQuery = Queries.payDebtEmployeeCivilian(userID, userType, value);
+        } else if (merchant) {
+            //insQuery = Queries.payDebtMerchant(userID, userType, value);
+        } else {
+            //insQuery = Queries.payDebtCivilian(userID, userType, value);
+        }
+
+        //retVal = executeSingleQuery(insQuery);
+        if (retVal > 0) {
+            succeed = true;
+        }
+        return succeed;
+    }
+
+    private static int executeSingleQuery(String insQuery) throws ClassNotFoundException {
+        int retVal = 0;
         try {
             try (Connection con = dbAPI.getConnection();
                     Statement stmt = con.createStatement()) {
-                stmt.executeUpdate(insQuery);
+                retVal = stmt.executeUpdate(insQuery);
                 // Close connection
                 stmt.close();
                 con.close();
@@ -52,5 +82,6 @@ public class TransactionDB {
             // Log exception
             Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return retVal;
     }
 }

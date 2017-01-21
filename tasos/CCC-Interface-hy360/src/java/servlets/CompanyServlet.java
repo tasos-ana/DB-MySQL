@@ -1,5 +1,6 @@
 package servlets;
 
+import cs360db.db.TransactionDB;
 import cs360db.db.dbAPI;
 import java.io.IOException;
 import java.text.ParseException;
@@ -81,6 +82,9 @@ public class CompanyServlet extends HttpServlet {
                     break;
                 case "makeTransaction":
                     makeTranstacionAction(request, response);
+                    break;
+                case "payDebt":
+                    payDebtAction(request, response);
                     break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
@@ -272,6 +276,21 @@ public class CompanyServlet extends HttpServlet {
         if (!succeed) {
             response.setHeader("error", "Something goes wrong. "
                     + "Make sure that you have enough balance or your card isnt expired");
+        }
+    }
+
+    private void payDebtAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
+        String userID, userType;
+        double value;
+        boolean succeed;
+        userID = request.getParameter("userID");
+        userType = request.getParameter("userType");
+        value = Double.parseDouble(request.getParameter("value"));
+        
+        succeed = TransactionDB.payDebt(userID,userType,value);
+        if (!succeed) {
+            response.setHeader("error", "Something goes wrong. "
+                    + "Make sure that you have enough balance");
         }
     }
 

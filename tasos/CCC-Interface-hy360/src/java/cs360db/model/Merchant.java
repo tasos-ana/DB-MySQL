@@ -39,13 +39,14 @@ public class Merchant {
         }
     }
 
-    public Merchant(String id, String name, double totalProfit, double commission){
+    public Merchant(String id, String name, double totalProfit, double commission, double debt) {
         this.id = id;
         this.name = name;
         this.commission = commission;
         this.totalProfit = totalProfit;
+        this.debt = debt;
     }
-    
+
     public Merchant(String id, String name, int accountNumber, double commission, double totalProfit, double debt) {
         this.id = id;
         this.name = name;

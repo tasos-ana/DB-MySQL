@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -370,16 +369,17 @@ class UserDB {
     }
 
     private static User exportECivilian(ResultSet res) throws SQLException, ParseException {
-        assert (res.getString(3).equals(res.getString(10)));
+        assert (res.getString(3).equals(res.getString(11)));
         //Civilian export
         String Name = res.getString(1);
         String ID = res.getString(2);
-        Civilian employee = new Civilian(ID, Name, "employee_civilian");
+        double debt = Double.parseDouble(res.getString(4));
+        Civilian employee = new Civilian(ID, Name, debt);
 
         //Company export
-        Name = res.getString(4);
-        ID = res.getString(10);
-        double debt = Double.parseDouble(res.getString("Debt"));
+        Name = res.getString(5);
+        ID = res.getString(11);
+        debt = Double.parseDouble(res.getString(6));
         double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
         double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
         int accountNumber = Integer.parseInt(res.getString("Account_number"));
@@ -390,18 +390,19 @@ class UserDB {
     }
 
     private static User exportEMerchant(ResultSet res) throws SQLException, ParseException {
-        assert (res.getString(3).equals(res.getString(12)));
+        assert (res.getString(3).equals(res.getString(13)));
         //merchant export
         String Name = res.getString(1);
         String ID = res.getString(2);
         double totalProfit = Double.parseDouble(res.getString("Total_profit"));
         double commission = Double.parseDouble(res.getString("Commission"));
-        Merchant employee = new Merchant(ID, Name, totalProfit, commission);
+        double debt = Double.parseDouble(res.getString(6));
+        Merchant employee = new Merchant(ID, Name, totalProfit, commission, debt);
 
         //Company export
-        Name = res.getString(6);
-        ID = res.getString(12);
-        double debt = Double.parseDouble(res.getString("Debt"));
+        Name = res.getString(7);
+        ID = res.getString(13);
+        debt = Double.parseDouble(res.getString(8));
         double creditBalance = Double.parseDouble(res.getString("Credit_balance"));
         double creditLimit = Double.parseDouble(res.getString("Credit_limit"));
         int accountNumber = Integer.parseInt(res.getString("Account_number"));

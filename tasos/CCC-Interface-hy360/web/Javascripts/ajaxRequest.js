@@ -265,27 +265,67 @@ function ajaxMakeTransactionRequest() {
     civilianType = getAccountType();
     transType = "charge";
     value = document.getElementById("buyGoods").value;
-    xhr = new XMLHttpRequest();
-    xhr.open('POST', 'CompanyServlet');
-    xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            if (xhr.getResponseHeader("error") !== null) {
-                window.alert(xhr.getResponseHeader("error"));
-            } else {
-                window.alert("Succeed transaction");
-                document.getElementById("home_link").click();
+    if (value <= 0) {
+        window.alert("Cant make transaction with negative or zero payoff.");
+        document.getElementById("buyGoods").focus();
+    } else {
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    window.alert("Succeed transaction");
+                    document.getElementById("home_link").click();
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
             }
-        } else if (xhr.status !== 200) {
-            window.alert("Request failed. Returned status of " + xhr.status);
-        }
-        pageReady();
-    };
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader("action", "makeTransaction");
-    pagePrepare();
-    xhr.send("civilianID=" + civilianID + "&merchantID=" + merchantID +
-            "&civilianType=" + civilianType + "&transType=" + transType +
-            "&value=" + value);
+            pageReady();
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader("action", "makeTransaction");
+        pagePrepare();
+        xhr.send("civilianID=" + civilianID + "&merchantID=" + merchantID +
+                "&civilianType=" + civilianType + "&transType=" + transType +
+                "&value=" + value);
+    }
+}
+
+function ajaxPayDebtRequest() {
+    var value, debt;
+    debt = document.getElementById("debt_amount").value;
+    value = document.getElementById("payDebt").value;
+    if (value <= 0 || value > debt) {
+        window.alert("Can't make transaction with negative,zero or bigger value from your debt");
+        document.getElementById("payDebt").focus();
+    } else {
+        var xhr, civilianID, civilianType;
+        civilianID = getUserID();
+        civilianType = getAccountType();
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    window.alert("Succeed debt payoff");
+                    document.getElementById("home_link").click();
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
+            }
+            pageReady();
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader("action", "payDebt");
+        pagePrepare();
+        xhr.send("userID=" + civilianID + "&userType=" + civilianType +
+                "&value=" + value);
+    }
 }
 
 function setWelcomeMessage(email) {
