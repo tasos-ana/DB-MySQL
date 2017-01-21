@@ -232,9 +232,11 @@ function ajaxEmployeeAction() {
     }
 }
 
-function ajaxMerchantsDropdownRequest() {
-    var xhr;
+function ajaxMerchantsDropdownRequest(content) {
+    var xhr, userID, userType;
     xhr = new XMLHttpRequest();
+    userID = getUserID();
+    userType = getAccountType();
     xhr.open('POST', 'CompanyServlet');
     xhr.onload = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -244,7 +246,7 @@ function ajaxMerchantsDropdownRequest() {
                 if (xhr.getResponseHeader("error") !== null) {
                     window.alert(xhr.getResponseHeader("error"));
                 } else {
-                    document.getElementById("merchantsDropdownContainer").innerHTML = xhr.responseText;
+                    document.getElementById(xhr.getResponseHeader("container")).innerHTML = xhr.responseText;
                 }
             }
             pageReady();
@@ -253,18 +255,30 @@ function ajaxMerchantsDropdownRequest() {
         }
     };
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', 'merchantDropdown');
-    xhr.send();
+    xhr.setRequestHeader('action', content + 'MerchantDropdown');
+    if (content === "refund") {
+        xhr.send("userID=" + userID + "&userType=" + userType);
+    } else {
+        xhr.send();
+    }
 }
 
-function ajaxMakeTransactionRequest() {
+function ajaxMakeTransactionRequest(transType) {
     "use strict";
-    var xhr, civilianID, merchantID, civilianType, transType, value;
+    var xhr, civilianID, merchantID, civilianType, value;
     civilianID = getUserID();
     merchantID = getMerchantID_buy();
     civilianType = getAccountType();
-    transType = "charge";
-    value = document.getElementById("buyGoods").value;
+    if (document.getElementById("merchantsDropdown").value === "default") {
+        window.alert("Please select a merchant if exist");
+        return;
+    }
+    if (transType === "charge") {
+        value = document.getElementById("buyGoods").value;
+    } else {
+        value = document.getElementById("payRefund").value;
+    }
+
     if (value <= 0) {
         window.alert("Cant make transaction with negative or zero payoff.");
         document.getElementById("buyGoods").focus();

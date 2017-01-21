@@ -59,8 +59,12 @@ public class dbAPI {
         return UserDB.getUser(email, type);
     }
 
-    public static ArrayList<String> getMerchants() throws ClassNotFoundException {
-        return UserDB.getMerchants();
+    public static ArrayList<String> getBuyMerchants() throws ClassNotFoundException {
+        return UserDB.getBuyMerchants();
+    }
+
+    public static ArrayList<String> getRefundMerchants(String email, String type) throws ClassNotFoundException {
+        return UserDB.getRefundMerchants(email, type);
     }
 
     public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
@@ -117,6 +121,8 @@ public class dbAPI {
             updateCivilianQuery = Queries.updateCivilian_charge(civilianID, civilianType, value, currDate);
             updateMerchantQuery = Queries.updateMerchant_charge(merchantID, merchantType, value);
         }
+        System.out.println(updateCivilianQuery);
+        System.out.println(updateMerchantQuery);
         executeSucceed = UserDB.executeUpdate(updateCivilianQuery, updateMerchantQuery);
 
         if (executeSucceed) {
@@ -127,7 +133,7 @@ public class dbAPI {
             int transID = Integer.parseInt(new AccountNumberGenerator().generate("3", 9));
 
             TransactionDB.recordTransaction(merchantID, civilianID, transID, value,
-                    transType, currDate,transTable.toString());
+                    transType, currDate, transTable.toString());
 
             state = true;
         }

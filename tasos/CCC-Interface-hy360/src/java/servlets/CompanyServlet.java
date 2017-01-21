@@ -77,8 +77,11 @@ public class CompanyServlet extends HttpServlet {
                 case "checkEmployee":
                     checkEmployeeAction(request, response);
                     break;
-                case "merchantDropdown":
-                    merchantDropdownAction(request, response);
+                case "buyMerchantDropdown":
+                    buyMerchantDropdownAction(request, response);
+                    break;
+                case "refundMerchantDropdown":
+                    refundMerchantDropdownAction(request, response);
                     break;
                 case "makeTransaction":
                     makeTranstacionAction(request, response);
@@ -251,14 +254,28 @@ public class CompanyServlet extends HttpServlet {
         }
     }
 
-    private void merchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
+    private void buyMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, ClassNotFoundException {
         StringBuilder url = new StringBuilder();
 
+        response.setHeader("container", "buyMerchantsDropdownContainer");
         url.append("/WEB-INF/JSP/merchantDropdownPage.jsp");
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly
-        context.setAttribute("data", dbAPI.getMerchants());
+        context.setAttribute("data", dbAPI.getBuyMerchants());
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void refundMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, IOException, ServletException {
+        StringBuilder url = new StringBuilder();
+        String id, type;
+        id = request.getParameter("userID");
+        type = request.getParameter("userType");
+        response.setHeader("container", "refundMerchantsDropdownContainer");
+        url.append("/WEB-INF/JSP/merchantDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getRefundMerchants(id, type));
         forwardToPage(request, response, url.toString());
     }
 
@@ -286,8 +303,8 @@ public class CompanyServlet extends HttpServlet {
         userID = request.getParameter("userID");
         userType = request.getParameter("userType");
         value = Double.parseDouble(request.getParameter("value"));
-        
-        succeed = TransactionDB.payDebt(userID,userType,value);
+
+        succeed = TransactionDB.payDebt(userID, userType, value);
         if (!succeed) {
             response.setHeader("error", "Something goes wrong. "
                     + "Make sure that you have enough balance");
