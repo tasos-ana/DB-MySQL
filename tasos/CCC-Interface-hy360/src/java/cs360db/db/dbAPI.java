@@ -121,8 +121,6 @@ public class dbAPI {
             updateCivilianQuery = Queries.updateCivilian_charge(civilianID, civilianType, value, currDate);
             updateMerchantQuery = Queries.updateMerchant_charge(merchantID, merchantType, value);
         }
-        System.out.println(updateCivilianQuery);
-        System.out.println(updateMerchantQuery);
         executeSucceed = UserDB.executeUpdate(updateCivilianQuery, updateMerchantQuery);
 
         if (executeSucceed) {
