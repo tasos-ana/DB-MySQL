@@ -89,6 +89,9 @@ public class CompanyServlet extends HttpServlet {
                 case "payDebt":
                     payDebtAction(request, response);
                     break;
+                case "cccCustomerInfo":
+                    cccCustomerInfoAction(request, response);
+                    break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
             }
@@ -266,7 +269,9 @@ public class CompanyServlet extends HttpServlet {
         forwardToPage(request, response, url.toString());
     }
 
-    private void refundMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, IOException, ServletException {
+    private void refundMerchantDropdownAction(HttpServletRequest request, HttpServletResponse response)
+            throws ClassNotFoundException, IOException, ServletException {
+        
         StringBuilder url = new StringBuilder();
         String id, type;
         id = request.getParameter("userID");
@@ -276,6 +281,20 @@ public class CompanyServlet extends HttpServlet {
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("data", dbAPI.getRefundMerchants(id, type));
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void cccCustomerInfoAction(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException, ClassNotFoundException {
+        
+        StringBuilder url = new StringBuilder();
+        response.setHeader("container", "cccCustomersInfoContainer");
+        url.append("/WEB-INF/JSP/cccCustomersInfoPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("good", dbAPI.getGoodCustomers());
+        context.setAttribute("bad", dbAPI.getBadCustomers());
+        context.setAttribute("month", dbAPI.getMonthMerchants());
         forwardToPage(request, response, url.toString());
     }
 

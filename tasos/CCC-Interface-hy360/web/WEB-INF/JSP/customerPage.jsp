@@ -44,7 +44,6 @@
 %>
 <div class="container">
     <h2>Customer dashboard</h2>
-
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
                               onclick="document.getElementById('home_link').click();">Home</a></li>
@@ -60,7 +59,7 @@
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
-            <h2 class="text-center">Your account details</h2>
+            <h3 class="text-center">Your account details</h3>
             <div class="container">
                 <div class="table-responsive">
                     <table class="table">
@@ -164,4 +163,5 @@
             </form>
         </div>
     </div>
+    <div class="row" id="cccCustomersInfoContainer"></div>
 </div>

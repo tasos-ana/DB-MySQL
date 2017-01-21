@@ -159,6 +159,40 @@ public class Queries {
         return insQuery.toString();
     }
 
+    public static String getGoodCustomers() {
+        StringBuilder insQuery = new StringBuilder();
+
+        insQuery.append(" SELECT ID FROM civilian WHERE Debt = 0")
+                .append(" UNION")
+                .append(" SELECT ID FROM merchant WHERE Debt = 0")
+                .append(" UNION")
+                .append(" SELECT ID FROM company WHERE Debt = 0");
+
+        return insQuery.toString();
+    }
+
+    public static String getBadCustomers() {//fix
+        StringBuilder insQuery = new StringBuilder();
+        insQuery.append(" SELECT ID FROM (")
+                .append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
+                .append(" UNION")
+                .append(" SELECT ID,Debt FROM merchant WHERE Debt <> 0")
+                .append(" UNION")
+                .append(" SELECT ID,Debt FROM company WHERE Debt <> 0) as x")
+                .append(" ORDER BY debt");
+        return insQuery.toString();
+    }
+
+    public static String getMonthMerchants() {//fix
+        StringBuilder insQuery = new StringBuilder();
+        insQuery.append(" SELECT ID FROM civilian WHERE Debt = 0")
+                .append(" UNION")
+                .append(" SELECT ID FROM merchant WHERE Debt = 0")
+                .append(" UNION")
+                .append(" SELECT ID FROM company WHERE Debt = 0");
+        return insQuery.toString();
+    }
+
     public static String updateCivilian_credit(String civilianID,
             String table, double value, Date currDate) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
@@ -383,5 +417,4 @@ public class Queries {
 
         return insQuery.toString();
     }
-
 }

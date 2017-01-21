@@ -16,6 +16,7 @@ function ajaxLoginRequest() {
                 document.getElementById("main_container").setAttribute("data-userID", xhr.getResponseHeader("dataEmail"));
                 document.getElementById("main_container").innerHTML = xhr.responseText;
                 succeed_login_action();
+                ajaxCccCustomerInfoRequest();
                 pageReady();
             } else {
                 document.getElementById("main_container").removeAttribute("data-type");
@@ -261,6 +262,33 @@ function ajaxMerchantsDropdownRequest(content) {
     } else {
         xhr.send();
     }
+}
+
+function ajaxCccCustomerInfoRequest() {
+    var xhr, userID, userType;
+    xhr = new XMLHttpRequest();
+    userID = getUserID();
+    userType = getAccountType();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    document.getElementById(xhr.getResponseHeader("container")).innerHTML = xhr.responseText;
+                }
+            }
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action','cccCustomerInfo');
+    xhr.send();
 }
 
 function ajaxMakeTransactionRequest(transType) {

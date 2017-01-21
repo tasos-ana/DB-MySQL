@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.AccountNumberGenerator;
@@ -65,6 +66,18 @@ public class dbAPI {
 
     public static ArrayList<String> getRefundMerchants(String email, String type) throws ClassNotFoundException {
         return UserDB.getRefundMerchants(email, type);
+    }
+
+    public static ArrayList<String> getGoodCustomers() throws ClassNotFoundException {
+        return UserDB.getArrayWithID(Queries.getGoodCustomers());
+    }
+
+    public static Map<String, Double> getBadCustomers() throws ClassNotFoundException {
+        return UserDB.getMapWithIdDebt(Queries.getBadCustomers());
+    }
+
+    public static ArrayList<String> getMonthMerchants() throws ClassNotFoundException {
+        return UserDB.getArrayWithID(Queries.getMonthMerchants());
     }
 
     public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
