@@ -110,7 +110,7 @@
                 <fieldset>
                     <legend class="legend_text">Buy goods</legend>
                     <div class="title_text">Merchant:</div>
-                    <div id="buyMerchantsDropdownContainer"></div>
+                    <select id="buyMerchantsDropdownContainer"></select>
                     <div class="title_text">Items Cost:</div>
                     <input type="text" class="text-center" id="buyGoods"
                            placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
@@ -145,7 +145,7 @@
                 <fieldset>
                     <legend class="legend_text">Refund</legend>
                     <div class="title_text">Merchant:</div>
-                    <div id="refundMerchantsDropdownContainer"></div>
+                    <select id="refundMerchantsDropdownContainer"></select>
                     <div class="title_text">Items Cost:</div>
                     <input type="text" class="text-center" id="payRefund"
                            placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>

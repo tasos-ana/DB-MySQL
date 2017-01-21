@@ -7,13 +7,12 @@
     context.removeAttribute("data"); // clear after use
 %>
 
-<select id="merchantsDropdown">
-    <%if (merchants.isEmpty()) {%>
-    <option value="default" selected>No merchants</option>
-    <%} else {%>
-    <option value="default" selected>Select Merchant...</option>
-    <% for (String merchant : merchants) {%>
-    <option value="<%=merchant%>"><%=merchant%></option>
-    <%}
+
+<%if (merchants.isEmpty()) {%>
+<option value="default" selected>No merchants</option>
+<%} else {%>
+<option value="default" selected>Select Merchant...</option>
+<% for (String merchant : merchants) {%>
+<option value="<%=merchant%>"><%=merchant%></option>
+<%}
         }%>
-</select>

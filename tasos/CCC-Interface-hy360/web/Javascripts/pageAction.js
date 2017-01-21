@@ -117,7 +117,11 @@ function getAccountDebtValue() {
 }
 
 function getMerchantID_buy() {
-    return document.getElementById("merchantsDropdown").value;
+    return document.getElementById("buyMerchantsDropdownContainer").value;
+}
+
+function getMerchantID_refund(){
+     return document.getElementById("refundMerchantsDropdownContainer").value;
 }
 
 function getUserID() {

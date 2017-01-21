@@ -267,16 +267,21 @@ function ajaxMakeTransactionRequest(transType) {
     "use strict";
     var xhr, civilianID, merchantID, civilianType, value;
     civilianID = getUserID();
-    merchantID = getMerchantID_buy();
     civilianType = getAccountType();
-    if (document.getElementById("merchantsDropdown").value === "default") {
-        window.alert("Please select a merchant if exist");
-        return;
-    }
     if (transType === "charge") {
         value = document.getElementById("buyGoods").value;
+        if (document.getElementById("buyMerchantsDropdownContainer").value === "default") {
+            window.alert("Please select a merchant if exist");
+            return;
+        }
+        merchantID = getMerchantID_buy();
     } else {
         value = document.getElementById("payRefund").value;
+        if (document.getElementById("refundMerchantsDropdownContainer").value === "default") {
+            window.alert("Please select a merchant if exist");
+            return;
+        }
+        merchantID = getMerchantID_refund();
     }
 
     if (value <= 0) {
