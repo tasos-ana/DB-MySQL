@@ -20,5 +20,5 @@ public class Company extends Civilian {
     public Company(String name, double debt, double creditBalance, double creditLimit, int accountNumber, Date validThru, String id) {
         super(name, debt, creditBalance, creditLimit, accountNumber, validThru, id);
     }
-    
+
 }

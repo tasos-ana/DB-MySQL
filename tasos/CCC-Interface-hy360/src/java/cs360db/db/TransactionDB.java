@@ -59,7 +59,6 @@ public class TransactionDB {
         } else {
             insQuery = Queries.payDebtCivilian(userID, userType, value);
         }
-        System.out.println(insQuery);
         retVal = executeSingleQuery(insQuery);
         if (retVal > 0) {
             succeed = true;

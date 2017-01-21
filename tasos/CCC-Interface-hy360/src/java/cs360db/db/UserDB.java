@@ -116,12 +116,37 @@ class UserDB {
         return type;
     }
 
-    protected static ArrayList<String> getMerchants() throws ClassNotFoundException {
+    protected static ArrayList<String> getBuyMerchants() throws ClassNotFoundException {
         ArrayList<String> merchantsIDs = new ArrayList<>();
         try (Connection con = dbAPI.getConnection();
                 Statement stmt = con.createStatement()) {
             String insQuery;
-            insQuery = Queries.getAllMerchants();
+            insQuery = Queries.getAllMerchants2Buy();
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                merchantsIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return merchantsIDs;
+    }
+
+    protected static ArrayList<String> getRefundMerchants(String email, String type) throws ClassNotFoundException {
+        ArrayList<String> merchantsIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getAllMerchants2Refund(email, type);
 
             stmt.execute(insQuery);
             ResultSet res = stmt.getResultSet();
