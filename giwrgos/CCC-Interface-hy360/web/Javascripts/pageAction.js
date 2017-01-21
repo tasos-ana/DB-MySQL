@@ -61,6 +61,10 @@ function openAccount_action() {
     renderPage();
 }
 
+function userPage_action() {
+    succeed_login_action();
+}
+
 function succeed_login_action() {
     document.getElementById("login_but").setAttribute("data-visible", "none");
     document.getElementById("open_account_but").setAttribute("data-visible", "none");
@@ -104,23 +108,57 @@ function pagePrepare() {
     document.getElementById("main_container").style.display = "none";
 }
 
-function getAccountName() {
-    return document.getElementById("cardHolder").value;
-}
-
-function getAccountNumber() {
-    return document.getElementById("cardNumber").value;
-}
-
 function getAccountType() {
     return document.getElementById("main_container").getAttribute("data-type");
-}
-
-function getAccountCardLimit() {
-    return document.getElementById("cardLimit").value;
 }
 
 function getAccountDebtValue() {
     return document.getElementById("debtValue").value;
 }
 
+function getMerchantID_buy() {
+    return document.getElementById("buyMerchantsDropdownContainer").value;
+}
+
+function getMerchantID_refund(){
+     return document.getElementById("refundMerchantsDropdownContainer").value;
+}
+
+function getUserID() {
+    return document.getElementById("main_container").getAttribute("data-userID");
+}
+
+function updateMerchantDebt() {
+    var value;
+    value = document.getElementById("debtValue").innerHTML;
+    document.getElementById("debt_amount").value = value;
+}
+
+function extraProperties() {
+    var type = document.getElementById("user_account_type").value;
+    if (type === "company") {
+        document.getElementById("extraProperties").style.display = "none";
+    } else {
+        document.getElementById("extraProperties").style.display = "block";
+    }
+}
+
+function addEmployeeAction() {
+    document.getElementById("removeEmployeeContainer").style.display = "none";
+    document.getElementById("addEmployeeContainer").style.display = "block";
+}
+
+function removeEmployeeAction() {
+    document.getElementById("removeEmployeeContainer").style.display = "block";
+    document.getElementById("addEmployeeContainer").style.display = "none";
+}
+
+function emailCheckValidity() {
+    if (!document.getElementById('login_form').checkValidity()) {
+        document.getElementById('usr_login_error').innerHTML = 'Invalid email';
+        document.getElementById('usr_login_error').style.color = 'red';
+    } else {
+        document.getElementById('usr_login_error').innerHTML = 'Valid email';
+        document.getElementById('usr_login_error').style.color = 'green';
+    }
+}

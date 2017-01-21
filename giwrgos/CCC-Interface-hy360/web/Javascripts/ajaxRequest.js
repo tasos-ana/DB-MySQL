@@ -2,57 +2,77 @@
 
 function ajaxLoginRequest() {
     "use strict";
-    var email, type, xhr;
+    var email, type, xhr, works, newType;
     email = document.getElementById("usr_email");
-    if (!email.checkValidity()) {
-        document.getElementById("usr_login_error").innerHTML = "Invalid email";
-        document.getElementById("usr_login_error").style.color = "red";
-    } else {
-        xhr = new XMLHttpRequest();
-        xhr.open('POST', 'CompanyServlet');
-        xhr.onload = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                if (xhr.getResponseHeader("error") === null) {
-                    var email = xhr.getResponseHeader("id");
-                    setWelcomeMessage(email);
-                    document.getElementById("main_container").innerHTML = xhr.responseText;
-                    succeed_login_action();
-                    pageReady();
+
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (xhr.getResponseHeader("error") === null) {
+                var email = xhr.getResponseHeader("id");
+                setWelcomeMessage(email);
+                document.getElementById("main_container").setAttribute("data-type", xhr.getResponseHeader("dataType"));
+                document.getElementById("main_container").setAttribute("data-userID", xhr.getResponseHeader("dataEmail"));
+                document.getElementById("main_container").innerHTML = xhr.responseText;
+                succeed_login_action();
+                ajaxCccCustomerInfoRequest();
+                pageReady();
+            } else {
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
+                if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                    document.getElementById("login_but").click();
                 } else {
-                    if (!cookieExist(xhr.getResponseHeader("fail"))) {
-                        document.getElementById("login_but").click();
-                    } else {
-                        renderPage();
-                        try {
-                            document.getElementById("usr_login_error").innerHTML = xhr.getResponseHeader("error");
-                            document.getElementById("usr_login_error").style.color = "red";
-                            pageReady();
-                        } catch (err) {
-                            document.getElementById("main_container").innerHTML = xhr.responseText;
-                        }
+                    renderPage();
+                    try {
+                        document.getElementById("usr_login_error").innerHTML = xhr.getResponseHeader("error");
+                        document.getElementById("usr_login_error").style.color = "red";
+                        pageReady();
+                    } catch (err) {
+                        pageReady();
+                        document.getElementById("main_container").innerHTML = xhr.responseText;
                     }
                 }
-            } else if (xhr.status !== 200) {
-                window.alert("Request failed. Returned status of " + xhr.status);
             }
-        };
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.setRequestHeader('action', 'login');
-        type = document.getElementById("user_account_type");
-        email = document.getElementById("usr_email");
-        pagePrepare();
-        if (email === null && type === null) {
-            xhr.send();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+            document.getElementById("main_container").innerHTML = xhr.responseText;
+            pageReady();
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action', 'login');
+    type = document.getElementById("user_account_type");
+    pagePrepare();
+    if (email === null && type === null) {
+        xhr.send();
+    } else {
+        if (!document.getElementById("login_form").checkValidity()) {
+            document.getElementById("usr_login_error").innerHTML = "Invalid email";
+            document.getElementById("usr_login_error").style.color = "red";
+            pageReady();
         } else {
-            document.getElementById("main_container").setAttribute("data-type",type.value);
-            xhr.send('email=' + email.value + '&type=' + type.value);
+            works = document.login.employee;
+            if (type.value !== "company") {
+                if (works.value === "yes") {
+                    newType = "employee_" + type.value;
+                } else {
+                    newType = type.value;
+                }
+            } else {
+                newType = type.value;
+            }
+            document.getElementById("main_container").setAttribute("data-type", newType);
+            document.getElementById("main_container").setAttribute("data-userID", email.value);
+            xhr.send('email=' + email.value + '&type=' + newType);
         }
     }
 }
 
 function ajaxOpenAccountRequest() {
     "use strict";
-    var xhr, email, type;
+    var xhr, email, type, name;
 
     if (validationAPI.form()) {
         xhr = new XMLHttpRequest();
@@ -64,12 +84,18 @@ function ajaxOpenAccountRequest() {
                 if (xhr.getResponseHeader("error") !== null) {
                     var err = xhr.getAllResponseHeader("error");
                     document.getElementById("usrEMAIL_err").innerHTML = err;
+                    document.getElementById("main_container").removeAttribute("data-type");
+                    document.getElementById("main_container").removeAttribute("data-userID");
                 } else {
+                    var email = xhr.getResponseHeader("id");
+                    setWelcomeMessage(email);
                     document.getElementById("main_container").innerHTML = xhr.responseText;
                     succeed_login_action();
                 }
             } else if (xhr.status !== 200) {
                 window.alert("Request failed. Returned status of " + xhr.status);
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
             }
         };
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -78,7 +104,10 @@ function ajaxOpenAccountRequest() {
 
         type = document.getElementById("user_account_type");
         email = document.getElementById("usrEMAIL");
-        xhr.send('email=' + email.value + '&type=' + type.value);
+        name = document.getElementById("usrNAME");
+        document.getElementById("main_container").setAttribute("data-type", type.value);
+        document.getElementById("main_container").setAttribute("data-userID", email.value);
+        xhr.send('email=' + email.value + '&name=' + name.value + '&type=' + type.value);
     } else {
         document.getElementById("form_alert").removeAttribute("hidden");
         document.getElementById("form_alert").addEventListener("mouseover", setTimeout(function () {
@@ -90,24 +119,36 @@ function ajaxOpenAccountRequest() {
 
 function ajaxCloseAccountRequest() {
     "use strict";
-    var xhr;
-    xhr = new XMLHttpRequest();
-    xhr.open('POST', 'CompanyServlet');
-    xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            if (!cookieExist(xhr.getResponseHeader("fail"))) {
-                document.getElementById("home_but").click();
-            } else {
-                document.getElementById("page_message").innerHTML = "Credit Card Company";
-                logout_action();
+    var xhr, currentDebt;
+    currentDebt = document.getElementById("debtValue").innerHTML;
+    if (currentDebt !== '0.0') {
+        window.alert("Can't delete your account while you have debt's to other people");
+    } else {
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                    document.getElementById("home_but").click();
+                } else {
+                    if (xhr.getResponseHeader("error") !== null) {
+                        window.alert(xhr.getResponseHeader("error"));
+                    } else {
+                        window.alert("Your account close with succed!");
+                        document.getElementById("page_message").innerHTML = "Credit Card Company";
+                        logout_action();
+                        document.getElementById("main_container").removeAttribute("data-type");
+                        document.getElementById("main_container").removeAttribute("data-userID");
+                    }
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
             }
-        } else if (xhr.status !== 200) {
-            window.alert("Request failed. Returned status of " + xhr.status);
-        }
-    };
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('action', 'close');
-    xhr.send();
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('action', 'close');
+        xhr.send();
+    }
 }
 
 function ajaxLogoutRequest() {
@@ -122,6 +163,8 @@ function ajaxLogoutRequest() {
             } else {
                 document.getElementById("page_message").innerHTML = "Credit Card Company";
                 logout_action();
+                document.getElementById("main_container").removeAttribute("data-type");
+                document.getElementById("main_container").removeAttribute("data-userID");
             }
         } else if (xhr.status !== 200) {
             window.alert("Request failed. Returned status of " + xhr.status);
@@ -133,12 +176,18 @@ function ajaxLogoutRequest() {
 }
 
 function ajaxEmployeeAction() {
-    var accountNumber, accountName, accountType, action;
-    accountNumber = document.employee.accountNumber;
-    accountName = document.employee.accountName;
-    accountType = document.employee.accountType;
-    action = document.employee.action;
-    if (accountName.checkValidity()) {
+    if (validationAPI.form()) {
+        var companyID, accountID, accountName, accountType, action;
+        companyID = document.getElementById("companyID").getAttribute("data-companyID");
+
+        accountName = document.employee.accountName;
+        accountType = document.employee.accountType;
+        action = document.employee.action;
+        if (action.value === "addEmployee") {
+            accountID = document.employee.accountID;
+        } else {
+            accountID = document.employee.removeAccountId;
+        }
         var xhr;
         xhr = new XMLHttpRequest();
         xhr.open('POST', 'CompanyServlet');
@@ -147,17 +196,181 @@ function ajaxEmployeeAction() {
                 if (!cookieExist(xhr.getResponseHeader("fail"))) {
                     document.getElementById("home_but").click();
                 } else {
-                    //TODO
+                    if (xhr.getResponseHeader("error") !== null) {
+                        window.alert(xhr.getResponseHeader("error"));
+                    } else {
+                        window.alert(xhr.getResponseHeader("succeed"));
+                        document.employee.reset();
+                        addEmployeeAction();
+                        document.getElementById("usrNAME_err").innerHTML = "*";
+                        document.getElementById("usrNAME_err").style.color = "red";
+
+                        document.getElementById("usrEMAIL_err").innerHTML = "*";
+                        document.getElementById("usrEMAIL_err").style.color = "red";
+
+                        document.getElementById("removeUsrEMAIL_err").innerHTML = "*";
+                        document.getElementById("removeUsrEMAIL_err").style.color = "red";
+                    }
                 }
+                pageReady();
             } else if (xhr.status !== 200) {
                 window.alert("Request failed. Returned status of " + xhr.status);
             }
         };
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('action', action.value);
-        xhr.send("accountNumber=" + accountNumber.value + 
-                 "&accountName="  + accountName.value   + 
-                 "&accountType=" + accountType.value);
+        pagePrepare();
+        xhr.send("companyID=" + companyID +
+                "&accountID=" + accountID.value +
+                "&accountName=" + accountName.value +
+                "&accountType=" + accountType.value);
+    } else {
+        document.getElementById("form_alert").removeAttribute("hidden");
+        document.getElementById("form_alert").addEventListener("mouseover", setTimeout(function () {
+            document.getElementById("form_alert").setAttribute("hidden", "true");
+        }, 2000));
+        return;
+    }
+}
+
+function ajaxMerchantsDropdownRequest(content) {
+    var xhr, userID, userType;
+    xhr = new XMLHttpRequest();
+    userID = getUserID();
+    userType = getAccountType();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    document.getElementById(xhr.getResponseHeader("container")).innerHTML = xhr.responseText;
+                }
+            }
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action', content + 'MerchantDropdown');
+    if (content === "refund") {
+        xhr.send("userID=" + userID + "&userType=" + userType);
+    } else {
+        xhr.send();
+    }
+}
+
+function ajaxCccCustomerInfoRequest() {
+    var xhr, userID, userType;
+    xhr = new XMLHttpRequest();
+    userID = getUserID();
+    userType = getAccountType();
+    xhr.open('POST', 'CompanyServlet');
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            if (!cookieExist(xhr.getResponseHeader("fail"))) {
+                document.getElementById("home_but").click();
+            } else {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    document.getElementById(xhr.getResponseHeader("container")).innerHTML = xhr.responseText;
+                }
+            }
+            pageReady();
+        } else if (xhr.status !== 200) {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+    };
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('action','cccCustomerInfo');
+    xhr.send();
+}
+
+function ajaxMakeTransactionRequest(transType) {
+    "use strict";
+    var xhr, civilianID, merchantID, civilianType, value;
+    civilianID = getUserID();
+    civilianType = getAccountType();
+    if (transType === "charge") {
+        value = document.getElementById("buyGoods").value;
+        if (document.getElementById("buyMerchantsDropdownContainer").value === "default") {
+            window.alert("Please select a merchant if exist");
+            return;
+        }
+        merchantID = getMerchantID_buy();
+    } else {
+        value = document.getElementById("payRefund").value;
+        if (document.getElementById("refundMerchantsDropdownContainer").value === "default") {
+            window.alert("Please select a merchant if exist");
+            return;
+        }
+        merchantID = getMerchantID_refund();
+    }
+
+    if (value <= 0) {
+        window.alert("Cant make transaction with negative or zero payoff.");
+        document.getElementById("buyGoods").focus();
+    } else {
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    window.alert("Succeed transaction");
+                    document.getElementById("home_link").click();
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
+            }
+            pageReady();
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader("action", "makeTransaction");
+        pagePrepare();
+        xhr.send("civilianID=" + civilianID + "&merchantID=" + merchantID +
+                "&civilianType=" + civilianType + "&transType=" + transType +
+                "&value=" + value);
+    }
+}
+
+function ajaxPayDebtRequest() {
+    var value;
+    value = document.getElementById("payDebt").value;
+    if (value <= 0) {
+        window.alert("Can't make transaction with negative,zero or bigger value from your debt");
+        document.getElementById("payDebt").focus();
+    } else {
+        var xhr, civilianID, civilianType;
+        civilianID = getUserID();
+        civilianType = getAccountType();
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet');
+        xhr.onload = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                if (xhr.getResponseHeader("error") !== null) {
+                    window.alert(xhr.getResponseHeader("error"));
+                } else {
+                    window.alert("Succeed payoff");
+                    document.getElementById("home_link").click();
+                }
+            } else if (xhr.status !== 200) {
+                window.alert("Request failed. Returned status of " + xhr.status);
+            }
+            pageReady();
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader("action", "payDebt");
+        pagePrepare();
+        xhr.send("userID=" + civilianID + "&userType=" + civilianType +
+                "&value=" + value);
     }
 }
 

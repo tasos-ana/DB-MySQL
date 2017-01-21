@@ -8,6 +8,16 @@
 <div class="animated_container">
     <h2 id="register_form_title" class="text-center">Registration form</h2>
     <form id="register_form" name="registration" class="form-horizontal">
+        <!--PERSONAL INFO FORM-->
+        <!--NAME-->
+        <div class="form-group">
+            <label for="usrNAME" class="control-label col-sm-3">Name:</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="usrNAME" name="usrNAME" placeholder="Enter Name" 
+                       required size="38" onchange="validationAPI.usrNAME()">
+            </div>
+            <div id="usrNAME_err" class="col-sm-3 text-left" style="color: red;">*</div>
+        </div>
         <!--LOGIN CREDENTIAL FORM-->
         <!--EMAIL-->
         <div class="form-group">
@@ -20,7 +30,7 @@
         </div>
         <select id="user_account_type">
             <option value="company">Company</option>
-            <option value="customer">Customer</option>
+            <option value="civilian">Customer</option>
             <option value="merchant">Merchant</option>
         </select>
         <div id="form_alert" class="alert alert-danger" hidden>
