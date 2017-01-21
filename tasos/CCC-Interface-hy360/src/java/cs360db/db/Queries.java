@@ -140,7 +140,7 @@ public class Queries {
 
     public static String getAllMerchants2Refund(String civilianID, String table) {
         StringBuilder insQuery = new StringBuilder();
-        String t1, t2, t3, t4, civilian;
+        String t1, t2, civilian;
         if (table.contains("employee")) {
             t1 = "emerchant_transaction_ecivilian";
             t2 = "merchant_transaction_ecivilian";
