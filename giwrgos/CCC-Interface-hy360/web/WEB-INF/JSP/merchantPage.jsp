@@ -4,7 +4,42 @@
     Author     : Tasos
 --%>
 
+<%@page import="cs360db.model.Merchant"%>
+<%@page import="cs360db.model.Company"%>
+<%@page import="cs360db.model.MerchantCreditCard"%>
+<%@page import="cs360db.model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    ServletContext context = getServletContext();
+    assert (context.getAttribute("data") instanceof User);
+    User user = (User) context.getAttribute("data");
+    context.removeAttribute("data"); // clear after use
+    String name, companyId, companyName;
+    double debt, commission, totalProfit;
+    int accountNumber;
+
+    assert (user.isMerchant() || user.isEmployeeMerchant());
+    if (user.isMerchant()) {
+        Merchant c = user.getMerchant();
+        name = c.getName();
+        commission = c.getCommission();
+        totalProfit = c.getTotalProfit();
+        companyId = null;
+        companyName = null;
+        debt = c.getDebt();
+        accountNumber = c.getAccountNumber();
+    } else {
+        Company c = user.getCompany();
+        Merchant m = user.getEmployeeMerchant();
+        debt = m.getDebt();
+        name = m.getName();
+        commission = m.getCommission();
+        totalProfit = m.getTotalProfit();
+        companyId = c.getId();
+        companyName = c.getName();
+        accountNumber = c.getAccountNumber();
+    }
+%>
 <script>
     $(function () {
         $("#datepickerfrom").datepicker();
@@ -17,11 +52,12 @@
     <h2>Merchant dashboard</h2>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#home" class="darkcolor">Home</a></li>
-        <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
+        <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
+                              onclick="document.getElementById('home_link').click();">Home</a></li>
+        <li><a data-toggle="tab" href="#debt" class="darkcolor"
+               onclick="updateMerchantDebt()">Debt</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>
-    
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
             <h2 class="text-center">Your account details</h2>
@@ -31,21 +67,29 @@
                         <thead>
                             <tr class="text-left">
                                 <th>#</th>
+                                    <%if (companyId != null) {%>            
+                                <th>Company name</th>
+                                <th>Company ID</th>
+                                    <%}%>
                                 <th>Card number</th>
                                 <th>Card holder</th>
-                                <th>Expired thru</th>
-                                <th>Credit limit</th>
-                                <th>Debt's</th>
+                                <th>Total profit</th>
+                                <th>Debt to CCC</th>
+                                <th>Commission</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr class="text-left">
                                 <td id="accountNo">1</td>
-                                <td id="cardNumber">1234 5678 9123 4567</td>
-                                <td id="cardHolder">Akakies Ta makaronia</td>
-                                <td id="cardExpired">2018</td>
-                                <td><span id="cardLimit">100,00</span> &#8364</td>
-                                <td><span id="debtValue">0,00</span> &#8364</td>
+                                <%if (companyId != null) {%>            
+                                <td id="companyName"><%= companyName%></td>
+                                <td id="companyId"><%= companyId%></td>
+                                <%}%>
+                                <td id="cardNumber"><%= accountNumber%></td>
+                                <td id="cardHolder"><%= name%></td>
+                                <td><span id="totalProfit"><%= totalProfit%></span> &#8364</td>
+                                <td><span id="debtValue"><%= debt%></span> &#8364</td>
+                                <td><span id="supply"><%= commission%></span>%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -57,24 +101,26 @@
                 <fieldset>
                     <legend class="legend_text">Pay your debt</legend>
                     <div class="title_text">Your debt is: </div>
-                    <input type="text" class="text-center" id="debt_amount" size="30" readonly value=" 0,00 &#8364">
+                    <span><input type="text" class="text-center" id="debt_amount"
+                                 size="30" readonly value="<%= debt%>">&#8364</span>
                     <div class="title_text">Payoff:</div>
-                    <input type="text" class="text-center" placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
+                    <input type="text" class="text-center" id="payDebt"
+                           placeholder="e.g 50,00" size="30" pattern="\d+(,\d{2})?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
-                            onclick="">
+                            onclick="ajaxPayDebtRequest()">
                         Pay now
                     </button>
                 </fieldset>
             </form>
         </div>
         <div id="search" class="tab-pane fade">
-            <form class="col-sm-8">
+            <form>
                 <fieldset>
-                    <legend>Search</legend>
+                    <legend class="legend_text">Search</legend>
                     <fieldset>
-                        <legend>Dealings</legend>
-                        <div>Date from: <input type="text" id="datepickerfrom"></div>
-                        <div>Date before: <input type="text" id="datepickerbefore"></div><br>
+                        <legend class="legend_text">Dealings</legend>
+                        <span>Date from: <input type="text" id="datepickerfrom" size='11'></span>
+                        <span>Date before: <input type="text" id="datepickerbefore" size='11'></span><br>
                         <button type="button" class="btn btn-default btn_style"  
                                 onclick="">
                             Refund now
@@ -84,4 +130,5 @@
             </form>
         </div>
     </div>
+    <div class="row" id="cccCustomersInfoContainer"></div>
 </div>
