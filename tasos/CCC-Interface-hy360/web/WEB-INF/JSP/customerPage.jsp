@@ -57,7 +57,9 @@
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#buy" class="darkcolor"
                onclick="ajaxMerchantsDropdownRequest()">Buy</a></li>
+            <%if (companyId != null) {%>
         <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
+            <%}%>
         <li><a data-toggle="tab" href="#refund" class="darkcolor">Refund</a></li>
         <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
     </ul>
@@ -118,6 +120,7 @@
                 </fieldset>
             </form>
         </div>
+        <%if (companyId != null) {%>
         <div id="debt" class="tab-pane fade">
             <form>
                 <fieldset>
@@ -135,6 +138,7 @@
                 </fieldset>
             </form>
         </div>
+        <%}%>
         <div id="refund" class="tab-pane fade">
             <form>
                 <fieldset>
