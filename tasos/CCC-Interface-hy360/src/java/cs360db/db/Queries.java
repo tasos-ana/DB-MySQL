@@ -419,7 +419,7 @@ public class Queries {
 
     static String getAllCompanyEmployee(String companyID) {
         StringBuilder insQuery = new StringBuilder();
-        insQuery.append(" SELECT id FROM employee_civiliean")
+        insQuery.append(" SELECT id FROM employee_civilian")
                 .append(" WHERE company_id = '").append(companyID).append("'")
                 .append(" UNION")
                 .append(" SELECT id FROM employee_merchant")

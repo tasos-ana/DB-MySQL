@@ -13,7 +13,7 @@
             <url>src/java/servlets/CompanyServlet.java</url>
             <bookmark id="2">
                 <name/>
-                <line>178</line>
+                <line>190</line>
                 <key/>
             </bookmark>
         </file>
@@ -28,15 +28,12 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/customerSearch.jsp</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/civilianSearch.jsp</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/src/java/servlets/requestPagesServlet.java</file>
             <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/Javascripts/ajaxRequest.js</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/adminSearch.jsp</file>
+            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/src/java/cs360db/db/dbAPI.java</file>
             <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/src/java/servlets/CompanyServlet.java</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/adminPage.jsp</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/companyPage.jsp</file>
-            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/cccCustomersInfoPage.jsp</file>
+            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/web/WEB-INF/JSP/merchantPage.jsp</file>
+            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/src/java/cs360db/db/Queries.java</file>
+            <file>file:/E:/Dropbox/Uoc-Csd/Εξάμηνο%209ο/ΗΥ-360%20-Αρχεία%20και%20Βάσεις/Exercises/Project/tasos/CCC-Interface-hy360/src/java/cs360db/db/UserDB.java</file>
         </group>
     </open-files>
 </project-private>

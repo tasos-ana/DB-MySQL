@@ -337,7 +337,7 @@ public class CompanyServlet extends HttpServlet {
         StringBuilder url = new StringBuilder();
         String id;
         id = request.getParameter("userID");
-        response.setHeader("container", "field1Value");
+        response.setHeader("container", "field0Value");
         url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly

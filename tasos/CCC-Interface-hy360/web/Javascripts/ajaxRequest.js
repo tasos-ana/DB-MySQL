@@ -307,6 +307,27 @@ function ajaxSearchRequest() {
     xhr.send("page=" + searchPage);
 }
 
+function ajaxUpdateFieldRequest() {
+    var oldUserID, oldUserType, employeeID, employeeType;
+    oldUserID = getUserID();
+    oldUserType = getAccountType();
+
+    employeeID = document.getElementById("field0Value").value;
+    employeeType = ajaxGetEmployeeType(employeeID, oldUserID);
+
+    document.getElementById("main_container").setAttribute("data-userID", employeeID);
+    document.getElementById("main_container").setAttribute("data-type", employeeType);
+
+    if (employeeType.includes("civilian")) {
+        ajaxUsersDropdownRequest('search');
+    } else {
+        ajaxUsersDropdownRequest('searchCivilian')
+    }
+
+    document.getElementById("main_container").setAttribute("data-userID", oldUserID);
+    document.getElementById("main_container").setAttribute("data-type", oldUserType);
+}
+
 function ajaxCccCustomerInfoRequest() {
     var xhr, userID, userType;
     xhr = new XMLHttpRequest();
@@ -421,6 +442,11 @@ function ajaxSearchExecuteRequest() {
     var xhr, userID, userType;
     userID = getUserID();
     userType = getAccountType();
+    var employeeID = document.getElementById("field0Value").value;
+    if (userType === "company" && employeeID !== "default") {
+        userType = ajaxGetEmployeeType(employeeID, userID);
+        userID = employeeID;
+    }
 
     var table1, table2, merchantID1, civilianID1, merchantID2, civilianID2, compareID, thisID;
     if (userType.split("_")[0] === "employee") {
@@ -480,8 +506,10 @@ function ajaxSearchExecuteRequest() {
     query = query + civilianID2 + " as civilianID, value, type, date FROM " + table2 + ") a";
     query = query + " WHERE 1=1 AND " + thisID + "= '" + userID + "'";
 
-    var field1Query, field2Query, field3Query, field4Query = null, field5Query = null;
-    field1Query = " AND " + compareID + " = '" + document.getElementById("field1Value").value + "' ";
+    var field1Query = null, field2Query, field3Query, field4Query = null, field5Query = null;
+    if (document.getElementById("field1Value").value !== userID) {
+        field1Query = " AND " + compareID + " = '" + document.getElementById("field1Value").value + "' ";
+    }
     field2Query = " AND type = '" + document.getElementById("field2Value").value + "' ";
     field3Query = " AND value " + document.getElementById("field3Operation").value + " " + document.getElementById("field3Value").value;
 
@@ -493,7 +521,7 @@ function ajaxSearchExecuteRequest() {
         field5Query = " AND date BETWEEN '" + document.getElementById("field5Value1").value + "' AND '" + document.getElementById("field5Value2").value + "'";
     }
 
-    if (!field1Query.includes("default")) {
+    if (field1Query !== null && !field1Query.includes("default")) {
         query = query + field1Query;
     }
     if (!field2Query.includes("default")) {
@@ -527,6 +555,21 @@ function ajaxSearchExecuteRequest() {
     xhr.setRequestHeader("action", "executeSearch");
     pagePrepare();
     xhr.send("insQuery=" + query);
+}
+
+function ajaxGetEmployeeType(userID, companyID) {
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'CompanyServlet', false);
+
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader("action", "checkEmployee");
+    xhr.send("email=" + userID + "&companyID=" + companyID + "&employeeType=civilian");
+
+    if (xhr.getResponseHeader("error") !== null) {
+        return "employee_merchant";
+    } else {
+        return "employee_civilian";
+    }
 }
 
 function setWelcomeMessage(email) {
