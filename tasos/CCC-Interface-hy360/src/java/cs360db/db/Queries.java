@@ -162,7 +162,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    public static String getBadCustomers() {//fix
+    public static String getBadCustomers() {
         StringBuilder insQuery = new StringBuilder();
         insQuery.append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
                 .append(" UNION")
@@ -170,16 +170,6 @@ public class Queries {
                 .append(" UNION")
                 .append(" SELECT ID,Debt FROM company WHERE Debt <> 0")
                 .append(" ORDER BY debt");
-        return insQuery.toString();
-    }
-
-    public static String getMonthMerchants() {//fix
-        StringBuilder insQuery = new StringBuilder();
-        insQuery.append(" SELECT ID FROM civilian WHERE Debt = 0")
-                .append(" UNION")
-                .append(" SELECT ID FROM merchant WHERE Debt = 0")
-                .append(" UNION")
-                .append(" SELECT ID FROM company WHERE Debt = 0");
         return insQuery.toString();
     }
 
@@ -240,24 +230,13 @@ public class Queries {
     public static String updateMerchant_charge(String merchantID,
             String table, double value) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
-        if (table.contains("employee")) {
-            String companyID = UserDB.getCompany(merchantID, table);
-            insQuery.append(" UPDATE company co, ").append(table).append(" em")
-                    .append(" SET")
-                    .append(" co.Debt = co.Debt + ").append(value).append("*em.Commission/100")
-                    .append(" , em.Debt = em.Debt + ").append(value).append("*em.Commission/100")
-                    .append(" , em.Total_profit = em.Total_profit + ").append(value)
-                    .append(" WHERE")
-                    .append(" co.ID = '").append(companyID).append("'")
-                    .append(" AND em.ID = '").append(merchantID).append("'");
-        } else {
-            insQuery.append(" UPDATE ").append(table)
-                    .append(" SET")
-                    .append(" Total_profit = Total_profit + ").append(value)
-                    .append(" , Debt = Debt + ").append(value).append("*Commission/100")
-                    .append(" WHERE ")
-                    .append(" ID = '").append(merchantID).append("'");
-        }
+
+        insQuery.append(" UPDATE ").append(table)
+                .append(" SET")
+                .append(" Total_profit = Total_profit + ").append(value)
+                .append(" , Debt = Debt + ").append(value).append("*Commission/100")
+                .append(" WHERE ")
+                .append(" ID = '").append(merchantID).append("'");
 
         return insQuery.toString();
     }
@@ -361,19 +340,14 @@ public class Queries {
 
     public static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
-        String companyID = UserDB.getCompany(merchantID, table);
-        insQuery.append(" UPDATE company co, ").append(table).append(" em")
+        insQuery.append(" UPDATE ").append(table)
                 .append(" SET")
-                .append(" co.Debt = co.Debt - ").append(value)
-                .append(" , co.Credit_balance = co.Credit_balance + ").append(value)
-                .append(" , em.Debt = em.Debt - ").append(value)
-                .append(" , em.Total_profit = em.Total_profit - ").append(value)
+                .append(" , Debt = Debt - ").append(value)
+                .append(" , Total_profit = Total_profit - ").append(value)
                 .append(" WHERE")
-                .append(" co.ID = '").append(companyID).append("'")
-                .append(" AND em.ID = '").append(merchantID).append("'")
-                .append(" AND co.Debt > ").append(value)
-                .append(" AND em.Debt > ").append(value)
-                .append(" AND em.Total_profit > ").append(value);
+                .append(" AND ID = '").append(merchantID).append("'")
+                .append(" AND Debt >= ").append(value)
+                .append(" AND Total_profit >= ").append(value);
 
         return insQuery.toString();
     }
@@ -387,7 +361,7 @@ public class Queries {
                 .append(" , Debt = Debt - ").append(value)
                 .append(" WHERE ")
                 .append(" ID = '").append(merchantID).append("'")
-                .append(" AND Debt > ").append(value)
+                .append(" AND Debt >= ").append(value)
                 .append(" AND Total_profit > ").append(value);
 
         return insQuery.toString();
@@ -509,7 +483,7 @@ public class Queries {
                 .append(" ORDER BY profit DESC");
         return insQuery.toString();
     }
-    
+
     public static String applyDiscount(String email, String table) {
         StringBuilder insQuery = new StringBuilder();
 

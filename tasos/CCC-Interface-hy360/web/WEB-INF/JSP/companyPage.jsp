@@ -35,6 +35,7 @@
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Employee Actions</a></li>
+        <li><a data-toggle="tab" href="#debt" class="darkcolor"> Debt </a></li>
         <li><a data-toggle="tab" href="#searchTab" class="darkcolor" 
                onclick="ajaxSearchRequest(); ajaxUsersDropdownRequest('searchCompany')">Search</a></li>
     </ul>
@@ -117,9 +118,9 @@
                     <div class='col-sm-1'></div>
                     <div class='col-sm-3'>
                         <input type="radio" name="accountType" value="civilian" checked  
-                               onclick="ajaxUsersDropdownRequest('halfCompany', 'civilian')">Customer
+                               onclick="ajaxUsersDropdownRequest('halfCompany', 'civilian')">Civilian
                         <input type="radio" name="accountType" value="merchant" 
-                               onclick="ajaxUsersDropdownRequest('halfCompany', 'civilian')">Merchant
+                               onclick="ajaxUsersDropdownRequest('halfCompany', 'merchant')">Merchant
                     </div>
                     <div class='col-sm-3'></div>
                 </div>
@@ -140,6 +141,23 @@
                     </div>
                     <button type="button" class="btn_style" onclick="ajaxEmployeeAction()">Submit</button>
                 </div>
+            </form>
+        </div>
+        <div id="debt" class="tab-pane fade">
+            <form>
+                <fieldset>
+                    <legend class="legend_text">Pay your debt</legend>
+                    <div class="title_text">Your debt is: </div>
+                    <input type="text" class="text-center" id="debt_amount" 
+                           size="30" readonly value="<%= debt%> &#8364">
+                    <div class="title_text">Payoff:</div>
+                    <input type="text" class="text-center" id ="payDebt"
+                           placeholder="e.g 50.0" size="30" pattern="\d+(.\d+)?"><br><br>
+                    <button type="button" class="btn btn-default btn_style"  
+                            onclick="ajaxPayDebtRequest()">
+                        Pay now
+                    </button>
+                </fieldset>
             </form>
         </div>
         <div id="searchTab" class="tab-pane fade">
