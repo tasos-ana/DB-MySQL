@@ -128,16 +128,6 @@ public class Queries {
         return insQuery.toString();
     }
 
-    public static String getAllMerchants2Buy() {
-        StringBuilder insQuery = new StringBuilder();
-
-        insQuery.append(" SELECT ID FROM merchant")
-                .append(" UNION")
-                .append(" SELECT ID FROM employee_merchant");
-
-        return insQuery.toString();
-    }
-
     public static String getAllMerchants2Refund(String civilianID, String table) {
         StringBuilder insQuery = new StringBuilder();
         String t1, t2, civilian;
@@ -368,7 +358,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
+    public static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
         String companyID = UserDB.getCompany(merchantID, table);
         insQuery.append(" UPDATE company co, ").append(table).append(" em")
@@ -387,7 +377,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtMerchant(String merchantID, String table, double value) {
+    public static String payDebtMerchant(String merchantID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
@@ -402,7 +392,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtCivilian(String civilianID, String table, double value) {
+    public static String payDebtCivilian(String civilianID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
@@ -417,7 +407,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String getAllCompanyEmployee(String companyID) {
+    public static String getAllCompanyEmployee(String companyID) {
         StringBuilder insQuery = new StringBuilder();
         insQuery.append(" SELECT id FROM employee_civilian")
                 .append(" WHERE company_id = '").append(companyID).append("'")
@@ -428,7 +418,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String getAllCoopedCivilian(String email, String type) {
+    public static String getAllCoopedCivilian(String email, String type) {
         StringBuilder insQuery = new StringBuilder();
 
         if (type.contains("employee")) {
@@ -443,6 +433,19 @@ public class Queries {
                     .append(" UNION")
                     .append(" SELECT civilian_id from merchant_transaction_civilian")
                     .append(" WHERE merchant_id = '").append(email).append("'");
+        }
+
+        return insQuery.toString();
+    }
+
+    public static String getAllCustomers(String table) {
+        StringBuilder insQuery = new StringBuilder();
+        if (table.equals("company")) {
+            insQuery.append(" SELECT id FROM ").append(table);
+        } else {
+            insQuery.append(" SELECT id FROM ").append(table)
+                    .append(" UNION ")
+                    .append(" SELECT id FROM ").append("employee_").append(table);
         }
 
         return insQuery.toString();

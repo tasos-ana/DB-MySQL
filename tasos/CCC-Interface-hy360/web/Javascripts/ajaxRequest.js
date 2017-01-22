@@ -240,7 +240,7 @@ function ajaxEmployeeAction() {
     }
 }
 
-function ajaxUsersDropdownRequest(content) {
+function ajaxUsersDropdownRequest(content, type = "") {
     var xhr, userID, userType;
     xhr = new XMLHttpRequest();
     userID = getUserID();
@@ -268,8 +268,8 @@ function ajaxUsersDropdownRequest(content) {
             || content === "searchCivilian") {
         xhr.send("userID=" + userID + "&userType=" + userType);
     } else {
-        xhr.send();
-    }
+        xhr.send("customerType=" + type);
+}
 }
 
 function ajaxSearchRequest() {
@@ -278,8 +278,8 @@ function ajaxSearchRequest() {
     userType = getAccountType();
     var type = userType.split("_");
     if (type[0] === "employee") {
-        if (type[1] === "civilianSearch") {
-            searchPage = "eCivilianSearch";
+        if (type[1] === "civilian") {
+            searchPage = "civilianSearch";
         } else {
             searchPage = "merchantSearch";
         }
@@ -321,11 +321,46 @@ function ajaxUpdateFieldRequest() {
     if (employeeType.includes("civilian")) {
         ajaxUsersDropdownRequest('search');
     } else {
-        ajaxUsersDropdownRequest('searchCivilian')
+        ajaxUsersDropdownRequest('searchCivilian');
     }
 
     document.getElementById("main_container").setAttribute("data-userID", oldUserID);
     document.getElementById("main_container").setAttribute("data-type", oldUserType);
+}
+
+function ajaxUpdateUpdateFieldRequest() {
+    var userType, userID;
+    userType = getAccountType();
+    userID = document.getElementById("field0Value").value;
+    document.getElementById("searchButton").disabled = false;
+    if (userID === "default") {
+        document.getElementById("searchButton").disabled = true;
+    }
+    if (userType === "company") {
+        ajaxUpdateFieldRequest();
+    } else if (userType === "civilian") {
+        document.getElementById("main_container").setAttribute("data-userID", userID);
+        ajaxUsersDropdownRequest('search');
+    } else if (userType === "merchant") {
+        document.getElementById("main_container").setAttribute("data-userID", userID);
+        ajaxUsersDropdownRequest('searchCivilian');
+    } else {
+        window.alert("error at ajaxUpdateAdminFieldRequest ~line 348");
+    }
+}
+
+function ajaxUpdateAdminFieldRequest() {
+    var companyID;
+    if (document.getElementById("field0MinusValue").value === "default") {
+        document.getElementById("field0Value").value = "default";
+        document.getElementById("field1Value").value = "default";
+        document.getElementById("searchButton").disabled = true;
+    } else {
+        companyID = document.getElementById("field0MinusValue").value;
+        document.getElementById("main_container").setAttribute("data-userID", companyID);
+        ajaxUsersDropdownRequest('searchCompany');
+        document.getElementById("searchButton").disabled = false;
+    }
 }
 
 function ajaxCccCustomerInfoRequest() {
@@ -506,7 +541,7 @@ function ajaxSearchExecuteRequest() {
                         + " or merchant_company_id = '" + userID + "') a";
                 break;
             default:
-                window.alert("assert ajaxReqeust.js ~line 463");
+                window.alert("assert ajaxReqeust.js ~line 543");
         }
     }
 

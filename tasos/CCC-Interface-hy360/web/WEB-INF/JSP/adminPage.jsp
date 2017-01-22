@@ -6,7 +6,7 @@
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#moftm" class="darkcolor"
                onclick="ajaxUsersDropdownRequest('buy')">Merchant of the month</a></li>
-        <li><a data-toggle="tab" href="#search" class="darkcolor"
+        <li><a data-toggle="tab" href="#searchTab" class="darkcolor"
                onclick="ajaxSearchRequest()">Search</a></li>
     </ul>
 
@@ -17,9 +17,11 @@
             <p></p>
             <button class = "btn_style">Make discount on best Merchant</button>
         </div>
-        <div id="search" class="tab-pane fade">
+        <div id="searchTab" class="tab-pane fade">
+            <div id="searchResults"></div>
+            <div id="search">
+            </div>
         </div>
     </div>
-    <div id="searchResults"></div>
     <div class="row" id="cccCustomersInfoContainer"></div>
 </div>

@@ -120,8 +120,8 @@ function getMerchantID_buy() {
     return document.getElementById("buyMerchantsDropdownContainer").value;
 }
 
-function getMerchantID_refund(){
-     return document.getElementById("refundMerchantsDropdownContainer").value;
+function getMerchantID_refund() {
+    return document.getElementById("refundMerchantsDropdownContainer").value;
 }
 
 function getUserID() {
@@ -160,5 +160,43 @@ function emailCheckValidity() {
     } else {
         document.getElementById('usr_login_error').innerHTML = 'Valid email';
         document.getElementById('usr_login_error').style.color = 'green';
+    }
+}
+
+function adminAction() {
+    var customer;
+    customer = document.getElementById("customerType").value;
+    switch (customer) {
+        case "company":
+            document.getElementById("companyExtra").style.display = "inline-block";
+            document.getElementById("searchButton").style.display = "inline-block";
+            document.getElementById("allExtra").style.display = "inline-block";
+            document.getElementById("main_container").setAttribute("data-type", "company");
+            ajaxUsersDropdownRequest('allCompany', "company");
+            document.getElementById("searchButton").disabled = true;
+            break;
+        case "civilian":
+            document.getElementById("companyExtra").style.display = "none";
+            document.getElementById("searchButton").style.display = "inline-block";
+            document.getElementById("allExtra").style.display = "inline-block";
+            document.getElementById("main_container").setAttribute("data-type", "civilian");
+            ajaxUsersDropdownRequest('allCustomers', "civilian");
+            document.getElementById("searchButton").disabled = true;
+            document.getElementById("field1Value").value = "default";
+            break;
+        case "merchant":
+            document.getElementById("companyExtra").style.display = "none";
+            document.getElementById("searchButton").style.display = "inline-block";
+            document.getElementById("allExtra").style.display = "inline-block";
+            document.getElementById("main_container").setAttribute("data-type", "merchant");
+            ajaxUsersDropdownRequest('allCustomers', "merchant");
+            document.getElementById("searchButton").disabled = true;
+            document.getElementById("field1Value").value = "default";
+            break;
+        default:
+            document.getElementById("searchButton").style.display = "none";
+            document.getElementById("allExtra").style.display = "none";
+            document.getElementById("main_container").setAttribute("data-userID", "admin@ccc.gr");
+            document.getElementById("main_container").setAttribute("data-type", "admin");
     }
 }

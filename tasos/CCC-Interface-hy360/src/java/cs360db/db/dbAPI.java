@@ -162,4 +162,8 @@ public class dbAPI {
     public static ArrayList<String> getCoopedCivilian(String id, String type) throws ClassNotFoundException {
         return UserDB.getCoopedCivilian(id, type);
     }
+
+    public static ArrayList<String> getAllCustomers(String type) throws ClassNotFoundException {
+        return UserDB.getAllCustomers(type);
+    }
 }
