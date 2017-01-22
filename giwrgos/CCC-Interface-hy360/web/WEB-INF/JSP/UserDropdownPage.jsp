@@ -3,16 +3,16 @@
 <%
     ServletContext context = getServletContext();
     assert (context.getAttribute("data") instanceof ArrayList);
-    ArrayList<String> merchants = (ArrayList<String>) context.getAttribute("data");
+    ArrayList<String> users = (ArrayList<String>) context.getAttribute("data");
     context.removeAttribute("data"); // clear after use
 %>
 
 
-<%if (merchants.isEmpty()) {%>
-<option value="default" selected>No merchants</option>
+<%if (users.isEmpty()) {%>
+<option value="default" selected>No Users</option>
 <%} else {%>
-<option value="default" selected>Select Merchant...</option>
-<% for (String merchant : merchants) {%>
+<option value="default" selected>Select User...</option>
+<% for (String merchant : users) {%>
 <option value="<%=merchant%>"><%=merchant%></option>
 <%}
-        }%>
+    }%>

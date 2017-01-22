@@ -1,6 +1,7 @@
 package cs360db.db;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 /**
  *
@@ -128,19 +129,9 @@ public class Queries {
         return insQuery.toString();
     }
 
-    public static String getAllMerchants2Buy() {
-        StringBuilder insQuery = new StringBuilder();
-
-        insQuery.append(" SELECT ID FROM merchant")
-                .append(" UNION")
-                .append(" SELECT ID FROM employee_merchant");
-
-        return insQuery.toString();
-    }
-
     public static String getAllMerchants2Refund(String civilianID, String table) {
         StringBuilder insQuery = new StringBuilder();
-        String t1, t2, t3, t4, civilian;
+        String t1, t2, civilian;
         if (table.contains("employee")) {
             t1 = "emerchant_transaction_ecivilian";
             t2 = "merchant_transaction_ecivilian";
@@ -173,12 +164,11 @@ public class Queries {
 
     public static String getBadCustomers() {//fix
         StringBuilder insQuery = new StringBuilder();
-        insQuery.append(" SELECT ID FROM (")
-                .append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
+        insQuery.append(" SELECT ID,Debt FROM civilian WHERE Debt <> 0")
                 .append(" UNION")
                 .append(" SELECT ID,Debt FROM merchant WHERE Debt <> 0")
                 .append(" UNION")
-                .append(" SELECT ID,Debt FROM company WHERE Debt <> 0) as x")
+                .append(" SELECT ID,Debt FROM company WHERE Debt <> 0")
                 .append(" ORDER BY debt");
         return insQuery.toString();
     }
@@ -369,7 +359,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
+    public static String payDebtEmployeeMerchant(String merchantID, String table, double value) throws ClassNotFoundException {
         StringBuilder insQuery = new StringBuilder();
         String companyID = UserDB.getCompany(merchantID, table);
         insQuery.append(" UPDATE company co, ").append(table).append(" em")
@@ -388,7 +378,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtMerchant(String merchantID, String table, double value) {
+    public static String payDebtMerchant(String merchantID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
@@ -403,7 +393,7 @@ public class Queries {
         return insQuery.toString();
     }
 
-    static String payDebtCivilian(String civilianID, String table, double value) {
+    public static String payDebtCivilian(String civilianID, String table, double value) {
         StringBuilder insQuery = new StringBuilder();
 
         insQuery.append(" UPDATE ").append(table)
@@ -414,6 +404,118 @@ public class Queries {
                 .append(" ID = '").append(civilianID).append("'")
                 .append(" AND Credit_limit >= Credit_balance + ").append(value)
                 .append(" AND Debt >= ").append(value);
+
+        return insQuery.toString();
+    }
+
+    public static String getAllCompanyEmployee(String companyID) {
+        StringBuilder insQuery = new StringBuilder();
+        insQuery.append(" SELECT id FROM employee_civilian")
+                .append(" WHERE company_id = '").append(companyID).append("'")
+                .append(" UNION")
+                .append(" SELECT id FROM employee_merchant")
+                .append(" WHERE company_id = '").append(companyID).append("'");
+
+        return insQuery.toString();
+    }
+
+    public static String getAllCoopedCivilian(String email, String type) {
+        StringBuilder insQuery = new StringBuilder();
+
+        if (type.contains("employee")) {
+            insQuery.append(" SELECT employee_civilian_id as ID from emerchant_transaction_ecivilian")
+                    .append(" WHERE employee_merchant_id = '").append(email).append("'")
+                    .append(" UNION")
+                    .append(" SELECT civilian_id from emerchant_transaction_civilian")
+                    .append(" WHERE employee_merchant_id = '").append(email).append("'");
+        } else {
+            insQuery.append(" SELECT employee_civilian_id as ID from merchant_transaction_ecivilian")
+                    .append(" WHERE merchant_id = '").append(email).append("'")
+                    .append(" UNION")
+                    .append(" SELECT civilian_id from merchant_transaction_civilian")
+                    .append(" WHERE merchant_id = '").append(email).append("'");
+        }
+
+        return insQuery.toString();
+    }
+
+    public static String getAllCustomers(String table) {
+        StringBuilder insQuery = new StringBuilder();
+        if (table.equals("company")) {
+            insQuery.append(" SELECT id FROM ").append(table);
+        } else {
+            insQuery.append(" SELECT id FROM ").append(table)
+                    .append(" UNION ")
+                    .append(" SELECT id FROM ").append("employee_").append(table);
+        }
+
+        return insQuery.toString();
+    }
+
+    public static String getHalfCustomers(String table, String companyID) {
+        StringBuilder insQuery = new StringBuilder();
+
+        insQuery.append(" SELECT id FROM ").append("employee_").append(table)
+                .append(" WHERE company_id = '").append(companyID).append("'");
+
+        return insQuery.toString();
+    }
+
+    public static String getBestMerchant() {
+        StringBuilder insQuery = new StringBuilder();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new java.util.Date());
+
+        cal.add(Calendar.DATE, -cal.get(java.util.Calendar.DAY_OF_MONTH));
+        java.util.Date monthEnd = cal.getTime();
+
+        cal.add(Calendar.DATE, -cal.get(java.util.Calendar.DAY_OF_MONTH) + 1);
+        java.util.Date monthStart = cal.getTime();
+
+        java.sql.Date theMonthStart = new java.sql.Date(monthStart.getTime());
+        java.sql.Date theMonthEnd = new java.sql.Date(monthEnd.getTime());
+
+        insQuery.append(" SELECT allTransactions.merchant as ID, SUM(allTransactions.valueSum) AS profit FROM ")
+                .append(" (SELECT t.Merchant_ID AS merchant, SUM(t.value) as valueSum FROM merchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION ")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM merchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(t.value) as valueSum FROM merchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM merchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(t.value) as valueSum FROM emerchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM emerchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(t.value) as valueSum FROM emerchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM emerchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID)")
+                .append(" AS allTransactions")
+                .append(" GROUP BY allTransactions.merchant")
+                .append(" ORDER BY profit DESC");
+        return insQuery.toString();
+    }
+    
+    public static String applyDiscount(String email, String table) {
+        StringBuilder insQuery = new StringBuilder();
+
+        insQuery.append(" UPDATE ").append(table)
+                .append(" SET debt = debt - debt*5/100")
+                .append(" WHERE ID = '").append(email).append("'");
 
         return insQuery.toString();
     }

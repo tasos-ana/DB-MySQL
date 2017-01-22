@@ -68,16 +68,20 @@ public class dbAPI {
         return UserDB.getRefundMerchants(email, type);
     }
 
+    public static ArrayList<String> getCompanyEmployee(String email) throws ClassNotFoundException {
+        return UserDB.getCompanyEmployee(email);
+    }
+
     public static ArrayList<String> getGoodCustomers() throws ClassNotFoundException {
-        return UserDB.getArrayWithID(Queries.getGoodCustomers());
+        return UserDB.getArray(Queries.getGoodCustomers(), true);
     }
 
-    public static Map<String, Double> getBadCustomers() throws ClassNotFoundException {
-        return UserDB.getMapWithIdDebt(Queries.getBadCustomers());
+    public static ArrayList<String> getBadCustomers() throws ClassNotFoundException {
+        return UserDB.getArray(Queries.getBadCustomers(), true);
     }
 
-    public static ArrayList<String> getMonthMerchants() throws ClassNotFoundException {
-        return UserDB.getArrayWithID(Queries.getMonthMerchants());
+    public static ArrayList<String> getBestMerchant() throws ClassNotFoundException {
+        return UserDB.getArray(Queries.getBestMerchant(), false);
     }
 
     public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
@@ -149,5 +153,25 @@ public class dbAPI {
             state = true;
         }
         return state;
+    }
+
+    public static ArrayList<ArrayList<String>> getSearchResults(String insQuery) throws ClassNotFoundException {
+        return UserDB.getSearchResults(insQuery);
+    }
+
+    public static ArrayList<String> getCoopedCivilian(String id, String type) throws ClassNotFoundException {
+        return UserDB.getCoopedCivilian(id, type);
+    }
+
+    public static ArrayList<String> getAllCustomers(String type) throws ClassNotFoundException {
+        return UserDB.getAllCustomers(type);
+    }
+
+    public static ArrayList<String> getHalfCustomers(String type, String companyID) throws ClassNotFoundException {
+        return UserDB.getHalfCustomers(type, companyID);
+    }
+
+    public static boolean applyDiscount(String accountID) throws ClassNotFoundException {
+        return UserDB.applyDiscount(accountID);
     }
 }

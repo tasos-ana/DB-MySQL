@@ -33,7 +33,7 @@
         Company c = user.getCompany();
         Civilian ci = user.getEmployeeCivilian();
         name = ci.getName();
-        debt = c.getDebt();
+        debt = ci.getDebt();
         companyId = c.getId();
         companyName = c.getName();
         creditBalance = c.getCreditBalance();
@@ -48,14 +48,16 @@
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor" 
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#buy" class="darkcolor"
-               onclick="ajaxMerchantsDropdownRequest('buy')">Buy</a></li>
+               onclick="ajaxUsersDropdownRequest('buy')"> Buy </a></li>
             <%if (companyId == null) {%>
-        <li><a data-toggle="tab" href="#debt" class="darkcolor">Debt</a></li>
+        <li><a data-toggle="tab" href="#debt" class="darkcolor"> Debt </a></li>
             <%}%>
         <li><a data-toggle="tab" href="#refund" class="darkcolor"
-               onclick="ajaxMerchantsDropdownRequest('refund')">Refund </a></li >
-        <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
+               onclick="ajaxUsersDropdownRequest('refund')"> Refund </a></li >
+        <li><a data-toggle="tab" href="#searchTab" class="darkcolor"
+               onclick="ajaxSearchRequest(); ajaxUsersDropdownRequest('search');"> Search </a></li >
     </ul>
+
 
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
@@ -148,20 +150,12 @@
                 </fieldset>
             </form>
         </div>
-        <div id="search" class="tab-pane fade">
-            <form>
-                <!--TODO na mpei ena tab me diafora search-->
-
-                <legend class="legend_text">Transaction complex search</legend>
-                <span>Date from: <input type="date" id="datepickerfrom" size="11"></span>
-                <span>Date before: <input type="date" id="datepickerbefore" size="11"></span><br>
-                <button type="button" class="btn btn-default btn_style"  
-                        onclick="">
-                    Search now
-                </button>
-
-            </form>
+        <div id="searchTab" class="tab-pane fade">
+            <div id="searchResults"></div>
+            <div id="search">
+            </div>
         </div>
+
     </div>
     <div class="row" id="cccCustomersInfoContainer"></div>
 </div>
