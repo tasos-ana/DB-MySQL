@@ -438,12 +438,12 @@ function ajaxPayDebtRequest() {
 }
 
 function ajaxSearchExecuteRequest() {
-    var query;
+    var query, subQuery1 = null, subQuery2 = null;
     var xhr, userID, userType;
     userID = getUserID();
     userType = getAccountType();
-    var employeeID = document.getElementById("field0Value").value;
-    if (userType === "company" && employeeID !== "default") {
+    if (userType === "company" && document.getElementById("field0Value").value !== "default") {
+        var employeeID = document.getElementById("field0Value").value;
         userType = ajaxGetEmployeeType(employeeID, userID);
         userID = employeeID;
     }
@@ -492,22 +492,42 @@ function ajaxSearchExecuteRequest() {
                 thisID = "merchantID";
                 break;
             case "company":
-                window.alert("assert ajaxReqeust.js ~line 460");
+                subQuery1 = "(SELECT employee_merchant_id as merchantID, civilian_id as civilianID, "
+                        + " value, type, date FROM emerchant_transaction_civilian "
+                        + " WHERE merchant_company_id = '" + userID + "'"
+                        + " UNION"
+                        + " SELECT merchant_id as merchantID, employee_civilian_id as civilianID, "
+                        + " value, type, date FROM merchant_transaction_ecivilian "
+                        + " WHERE civilian_company_id = '" + userID + "'"
+                        + " UNION"
+                        + " SELECT employee_merchant_id as merchantID, employee_civilian_id as civilianID, "
+                        + " value, type, date FROM emerchant_transaction_ecivilian "
+                        + " WHERE civilian_company_id = '" + userID + "' "
+                        + " or merchant_company_id = '" + userID + "') a";
                 break;
             default:
                 window.alert("assert ajaxReqeust.js ~line 463");
         }
     }
 
-    query = " SELECT * FROM (SELECT " + merchantID1 + " as merchantID, ";
-    query = query + civilianID1 + " as civilianID, value, type, date FROM " + table1;
-    query = query + " UNION ";
-    query = query + "SELECT " + merchantID2 + " as merchantID, ";
-    query = query + civilianID2 + " as civilianID, value, type, date FROM " + table2 + ") a";
-    query = query + " WHERE 1=1 AND " + thisID + "= '" + userID + "'";
+    query = " SELECT * FROM ";
+
+    if (subQuery1 === null) {
+        subQuery2 = "(SELECT " + merchantID1 + " as merchantID, ";
+        subQuery2 = subQuery2 + civilianID1 + " as civilianID, value, type, date FROM " + table1;
+        subQuery2 = subQuery2 + " UNION ";
+        subQuery2 = subQuery2 + "SELECT " + merchantID2 + " as merchantID, ";
+        subQuery2 = subQuery2 + civilianID2 + " as civilianID, value, type, date FROM " + table2 + ") a";
+
+        query = query + subQuery2;
+        query = query + " WHERE 1=1 AND " + thisID + "= '" + userID + "'";
+    } else {
+        query = query + subQuery1;
+        query = query + " WHERE 1=1 ";
+    }
 
     var field1Query = null, field2Query, field3Query, field4Query = null, field5Query = null;
-    if (document.getElementById("field1Value").value !== userID) {
+    if (document.getElementById("field1Value").value !== userID && document.getElementById("field1Value").value !== "") {
         field1Query = " AND " + compareID + " = '" + document.getElementById("field1Value").value + "' ";
     }
     field2Query = " AND type = '" + document.getElementById("field2Value").value + "' ";
