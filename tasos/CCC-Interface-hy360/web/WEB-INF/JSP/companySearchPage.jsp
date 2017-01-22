@@ -2,7 +2,7 @@
 <form>
     <fieldset>
         <legend class="legend_text">Transaction search</legend>
-        <br>Transactions with: <select id="field1Value"></select>
+        <br>Transactions between: <select id="field0Value" onchange="ajaxUpdateFieldRequest()"></select> with <select id="field1Value"></select> 
         <p></p>
         Transaction type: <select id="field2Value">
             <option value="default">Both</option>

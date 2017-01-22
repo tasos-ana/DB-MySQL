@@ -73,15 +73,15 @@ public class dbAPI {
     }
 
     public static ArrayList<String> getGoodCustomers() throws ClassNotFoundException {
-        return UserDB.getArray(Queries.getGoodCustomers());
+        return UserDB.getArray(Queries.getGoodCustomers(), true);
     }
 
     public static ArrayList<String> getBadCustomers() throws ClassNotFoundException {
-        return UserDB.getArray(Queries.getBadCustomers());
+        return UserDB.getArray(Queries.getBadCustomers(), true);
     }
 
-    public static ArrayList<String> getMonthMerchants() throws ClassNotFoundException {
-        return UserDB.getArray(Queries.getMonthMerchants());
+    public static ArrayList<String> getBestMerchant() throws ClassNotFoundException {
+        return UserDB.getArray(Queries.getBestMerchant(), false);
     }
 
     public static boolean deleteUser(String email, String type) throws ParseException, ClassNotFoundException {
@@ -161,5 +161,17 @@ public class dbAPI {
 
     public static ArrayList<String> getCoopedCivilian(String id, String type) throws ClassNotFoundException {
         return UserDB.getCoopedCivilian(id, type);
+    }
+
+    public static ArrayList<String> getAllCustomers(String type) throws ClassNotFoundException {
+        return UserDB.getAllCustomers(type);
+    }
+
+    public static ArrayList<String> getHalfCustomers(String type, String companyID) throws ClassNotFoundException {
+        return UserDB.getHalfCustomers(type, companyID);
+    }
+
+    public static boolean applyDiscount(String accountID) throws ClassNotFoundException {
+        return UserDB.applyDiscount(accountID);
     }
 }

@@ -121,7 +121,7 @@ class UserDB {
         try (Connection con = dbAPI.getConnection();
                 Statement stmt = con.createStatement()) {
             String insQuery;
-            insQuery = Queries.getAllMerchants2Buy();
+            insQuery = Queries.getAllCustomers("merchant");
 
             stmt.execute(insQuery);
             ResultSet res = stmt.getResultSet();
@@ -216,19 +216,83 @@ class UserDB {
         return civilianIDs;
     }
 
-    protected static ArrayList<String> getArray(String insQuery) throws ClassNotFoundException {
+    protected static ArrayList<String> getAllCustomers(String table) throws ClassNotFoundException {
+        ArrayList<String> customerIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getAllCustomers(table);
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                customerIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return customerIDs;
+    }
+
+    static ArrayList<String> getHalfCustomers(String table, String companyID) throws ClassNotFoundException {
+        ArrayList<String> halfCustomerIDs = new ArrayList<>();
+        try (Connection con = dbAPI.getConnection();
+                Statement stmt = con.createStatement()) {
+            String insQuery;
+            insQuery = Queries.getHalfCustomers(table, companyID);
+
+            stmt.execute(insQuery);
+            ResultSet res = stmt.getResultSet();
+
+            while (res.next() == true) {
+                halfCustomerIDs.add(res.getString("ID"));
+            }
+
+            // Close connection
+            stmt.close();
+            con.close();
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return halfCustomerIDs;
+    }
+
+    protected static ArrayList<String> getArray(String insQuery, boolean takeAll) throws ClassNotFoundException {
         ArrayList<String> data = new ArrayList<>();
         try (Connection con = dbAPI.getConnection();
                 Statement stmt = con.createStatement()) {
 
             stmt.execute(insQuery);
             ResultSet res = stmt.getResultSet();
-
-            while (res.next() == true) {
-                data.add(res.getString("ID"));
-                try {
-                    data.add(res.getString("Debt"));
-                } catch (SQLException e) {
+            if (takeAll) {
+                while (res.next() == true) {
+                    data.add(res.getString("ID"));
+                    try {
+                        data.add(res.getString("Debt"));
+                    } catch (SQLException e) {
+                    }
+                }
+            } else {
+                double maxProfit = -1;
+                while (res.next() == true) {
+                    double currProfit = Double.parseDouble(res.getString("profit"));
+                    if (maxProfit == -1) {
+                        //init max
+                        maxProfit = currProfit;
+                    }
+                    if (maxProfit != currProfit) {
+                        break;
+                    }
+                    data.add(res.getString("ID"));
                 }
             }
 
@@ -595,6 +659,42 @@ class UserDB {
         }
 
         return data;
+    }
+
+    static boolean applyDiscount(String email) throws ClassNotFoundException {
+        boolean succeed = false;
+        try {
+            try (Connection con = dbAPI.getConnection();
+                    Statement stmt = con.createStatement()) {
+                String insQuery = Queries.applyDiscount(email, "employee_merchant");
+
+                int state = stmt.executeUpdate(insQuery);
+
+                if (state > 0) {
+                    succeed = true;
+                    System.out.println("#DB: Succeed apply discount on employee merchant: " + email);
+                } else {
+                    insQuery = Queries.applyDiscount(email, "merchant");
+
+                    state = stmt.executeUpdate(insQuery);
+                    if (state > 0) {
+                        succeed = true;
+                        System.out.println("#DB: Succeed apply discount on merchant: " + email);
+                    } else {
+                        System.out.println("#DB: Something goes wrong while applying discount on merchant: " + email);
+                    }
+                }
+
+                // Close connection
+                stmt.close();
+                con.close();
+            }
+
+        } catch (SQLException ex) {
+            // Log exception
+            Logger.getLogger(UserDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return succeed;
     }
 
 }
