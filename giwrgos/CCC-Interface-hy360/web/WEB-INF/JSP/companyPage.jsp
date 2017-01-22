@@ -151,7 +151,7 @@
                     <input type="text" class="text-center" id="debt_amount" 
                            size="30" readonly value="<%= debt%> &#8364">
                     <div class="title_text">Payoff:</div>
-                    <input type="text" class="text-center" id ="payDebt"
+                    <input type="number" class="text-center" id ="payDebt"
                            placeholder="e.g 50.0" size="30" pattern="\d+(.\d+)?"><br><br>
                     <button type="button" class="btn btn-default btn_style"  
                             onclick="ajaxPayDebtRequest()">

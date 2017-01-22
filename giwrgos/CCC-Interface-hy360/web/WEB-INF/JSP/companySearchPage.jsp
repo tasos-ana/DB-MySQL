@@ -19,9 +19,9 @@
             <option value="="> = </option>
             <option value="<>"> != </option>
         </select>
-        <input id="field3Value" type="text">
+        <input id="field3Value" type="number">
         <p></p>
-        Value between: <input type="text" id="field4Value1" size="11" placeholder=" min"> - <input type="text" id="field4Value2" size ="11" placeholder=" max">
+        Value between: <input type="number" id="field4Value1" size="11" placeholder=" min"> - <input type="number" id="field4Value2" size ="11" placeholder=" max">
         <p></p> 
         Date between: <input type="date" id="field5Value1" size="11" placeholder="from"> - <input type="date" id="field5Value2" size="11" placeholder="to">
         <p></p>
