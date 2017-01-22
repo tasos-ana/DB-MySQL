@@ -342,13 +342,13 @@ public class Queries {
         StringBuilder insQuery = new StringBuilder();
         insQuery.append(" UPDATE ").append(table)
                 .append(" SET")
-                .append(" , Debt = Debt - ").append(value)
+                .append(" Debt = Debt - ").append(value)
                 .append(" , Total_profit = Total_profit - ").append(value)
                 .append(" WHERE")
-                .append(" AND ID = '").append(merchantID).append("'")
+                .append(" ID = '").append(merchantID).append("'")
                 .append(" AND Debt >= ").append(value)
                 .append(" AND Total_profit >= ").append(value);
-
+        System.out.println(insQuery.toString());
         return insQuery.toString();
     }
 
@@ -362,7 +362,7 @@ public class Queries {
                 .append(" WHERE ")
                 .append(" ID = '").append(merchantID).append("'")
                 .append(" AND Debt >= ").append(value)
-                .append(" AND Total_profit > ").append(value);
+                .append(" AND Total_profit >= ").append(value);
 
         return insQuery.toString();
     }
