@@ -98,6 +98,9 @@ public class CompanyServlet extends HttpServlet {
                 case "allCompanyUserDropdown":
                     allCompanyUserDropdownAction(request, response);
                     break;
+                case "halfCompanyUserDropdown":
+                    halfCompanyUserDropdownAction(request, response);
+                    break;
                 case "makeTransaction":
                     makeTranstacionAction(request, response);
                     break;
@@ -383,6 +386,18 @@ public class CompanyServlet extends HttpServlet {
         ServletContext context = getServletContext();
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("data", dbAPI.getAllCustomers(type));
+        forwardToPage(request, response, url.toString());
+    }
+
+    private void halfCompanyUserDropdownAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, ClassNotFoundException {
+        StringBuilder url = new StringBuilder();
+        String type = request.getParameter("customerType");
+        String companyID = Cookies.getCookieValue(Cookies.getRequestCookieValue(request, "cccCompanyServlet", null));
+        response.setHeader("container", "employeeName");
+        url.append("/WEB-INF/JSP/UserDropdownPage.jsp");
+        ServletContext context = getServletContext();
+        //get from db the user an opportunity to check if user added correctly
+        context.setAttribute("data", dbAPI.getHalfCustomers(type, companyID));
         forwardToPage(request, response, url.toString());
     }
 

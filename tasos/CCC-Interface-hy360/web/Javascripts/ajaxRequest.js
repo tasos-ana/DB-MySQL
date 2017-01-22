@@ -183,7 +183,7 @@ function ajaxLogoutRequest() {
 }
 
 function ajaxEmployeeAction() {
-    if (validationAPI.form()) {
+    if (validationAPI.form() || document.employee.action.value === "removeEmployee") {
         var companyID, accountID, accountName, accountType, action;
         companyID = document.getElementById("companyID").getAttribute("data-companyID");
 
@@ -193,7 +193,11 @@ function ajaxEmployeeAction() {
         if (action.value === "addEmployee") {
             accountID = document.employee.accountID;
         } else {
-            accountID = document.employee.removeAccountId;
+            accountID = document.getElementById("employeeName");
+            if (accountID.value === "default") {
+                window.alert("Please choose one employee ID");
+                return;
+            }
         }
         var xhr;
         xhr = new XMLHttpRequest();
@@ -214,9 +218,6 @@ function ajaxEmployeeAction() {
 
                         document.getElementById("usrEMAIL_err").innerHTML = "*";
                         document.getElementById("usrEMAIL_err").style.color = "red";
-
-                        document.getElementById("removeUsrEMAIL_err").innerHTML = "*";
-                        document.getElementById("removeUsrEMAIL_err").style.color = "red";
                     }
                 }
                 pageReady();

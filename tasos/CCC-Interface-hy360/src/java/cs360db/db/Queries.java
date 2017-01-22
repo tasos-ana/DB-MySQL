@@ -451,4 +451,13 @@ public class Queries {
         return insQuery.toString();
     }
 
+    public static String getHalfCustomers(String table, String companyID) {
+        StringBuilder insQuery = new StringBuilder();
+        insQuery
+                .append(" SELECT id FROM ").append("employee_").append(table)
+                .append(" WHERE company_id = '").append(companyID).append("'");
+
+        return insQuery.toString();
+    }
+
 }

@@ -166,4 +166,8 @@ public class dbAPI {
     public static ArrayList<String> getAllCustomers(String type) throws ClassNotFoundException {
         return UserDB.getAllCustomers(type);
     }
+
+    public static ArrayList<String> getHalfCustomers(String type,String companyID) throws ClassNotFoundException {
+        return UserDB.getHalfCustomers(type,companyID);
+    }
 }

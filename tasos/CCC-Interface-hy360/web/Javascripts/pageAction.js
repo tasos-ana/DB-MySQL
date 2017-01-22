@@ -151,6 +151,9 @@ function addEmployeeAction() {
 function removeEmployeeAction() {
     document.getElementById("removeEmployeeContainer").style.display = "block";
     document.getElementById("addEmployeeContainer").style.display = "none";
+    
+    var type = document.employee.accountType.value;
+    ajaxUsersDropdownRequest("halfCompany", type);
 }
 
 function emailCheckValidity() {
