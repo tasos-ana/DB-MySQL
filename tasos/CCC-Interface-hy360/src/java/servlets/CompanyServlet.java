@@ -116,6 +116,9 @@ public class CompanyServlet extends HttpServlet {
                 case "executeSearch":
                     executeSearchAction(request, response);
                     break;
+                case "applyDiscount":
+                    applyDiscountAction(request, response);
+                    break;
                 default:
                     response.setHeader("fail", "Wrong Parameters");
             }
@@ -443,7 +446,7 @@ public class CompanyServlet extends HttpServlet {
         succeed = TransactionDB.payDebt(userID, userType, value);
         if (!succeed) {
             response.setHeader("error", "Something goes wrong. "
-                    + "Make sure that you have enough balance");
+                    + "Make sure that you have enough balance or your debt isn't zero");
         }
     }
 
@@ -453,6 +456,19 @@ public class CompanyServlet extends HttpServlet {
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("result", dbAPI.getSearchResults(insQuery));
         forwardToPage(request, response, "/WEB-INF/JSP/exportResults.jsp");
+    }
+
+    private void applyDiscountAction(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
+        boolean succeed;
+        String accountID;
+
+        accountID = request.getParameter("accountID");
+        
+        succeed = dbAPI.applyDiscount(accountID);
+        if (!succeed) {
+            response.setHeader("error", "Something goes wrong. "
+                    + "Can't apply discount on merchant: " + accountID);
+        }
     }
 
     private void forwardToPage(HttpServletRequest request,
@@ -535,5 +551,4 @@ public class CompanyServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

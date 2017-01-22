@@ -127,6 +127,10 @@ function ajaxOpenAccountRequest() {
 function ajaxCloseAccountRequest() {
     "use strict";
     var xhr, currentDebt;
+    if (getUserID() === "admin@ccc.gr") {
+        window.alert("Admin sobarepsou...");
+        return;
+    }
     currentDebt = document.getElementById("debtValue").innerHTML;
     if (currentDebt !== '0.0') {
         window.alert("Can't delete your account while you have debt's to other people");
@@ -620,11 +624,43 @@ function ajaxGetEmployeeType(userID, companyID) {
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader("action", "checkEmployee");
     xhr.send("email=" + userID + "&companyID=" + companyID + "&employeeType=civilian");
-
-    if (xhr.getResponseHeader("error") !== null) {
-        return "employee_merchant";
+    if (xhr.status === 200) {
+        if (xhr.getResponseHeader("error") !== null) {
+            return "employee_merchant";
+        } else {
+            return "employee_civilian";
+        }
     } else {
-        return "employee_civilian";
+        window.alert("Request failed. Returned status of " + xhr.status);
+    }
+}
+
+function ajaxBestMerchantsDiscountRequest() {
+    var merchantID, cnt = 1, defID = "bestMerchant";
+    cnt = 1;
+    merchantID = document.getElementById(defID + cnt);
+    while (merchantID !== null) {
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', 'CompanyServlet', false);
+
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader("action", "applyDiscount");
+        pagePrepare();
+        xhr.send("accountID=" + merchantID.innerHTML);
+        if (xhr.status === 200) {
+            if (xhr.getResponseHeader("error") !== null) {
+                window.alert(xhr.getResponseHeader("error"));
+            }
+        } else {
+            window.alert("Request failed. Returned status of " + xhr.status);
+        }
+
+        cnt++;
+        merchantID = document.getElementById(defID + cnt);
+        pageReady();
+    }
+    if (!(cnt === 1 && merchantID === null)) {
+        window.alert("Discount applied succeed");
     }
 }
 

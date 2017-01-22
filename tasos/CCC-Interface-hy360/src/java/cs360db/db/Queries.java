@@ -507,8 +507,16 @@ public class Queries {
                 .append(" AS allTransactions")
                 .append(" GROUP BY allTransactions.merchant")
                 .append(" ORDER BY profit DESC");
-        System.out.println(insQuery.toString());
         return insQuery.toString();
     }
+    
+    public static String applyDiscount(String email, String table) {
+        StringBuilder insQuery = new StringBuilder();
 
+        insQuery.append(" UPDATE ").append(table)
+                .append(" SET debt = debt - debt*5/100")
+                .append(" WHERE ID = '").append(email).append("'");
+
+        return insQuery.toString();
+    }
 }

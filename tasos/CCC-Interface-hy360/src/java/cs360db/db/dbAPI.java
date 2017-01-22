@@ -170,4 +170,8 @@ public class dbAPI {
     public static ArrayList<String> getHalfCustomers(String type, String companyID) throws ClassNotFoundException {
         return UserDB.getHalfCustomers(type, companyID);
     }
+
+    public static boolean applyDiscount(String accountID) throws ClassNotFoundException {
+        return UserDB.applyDiscount(accountID);
+    }
 }

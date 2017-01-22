@@ -15,7 +15,7 @@
         </div>
         <div id="moftm" class="tab-pane fade in">
             <p></p>
-            <button class = "btn_style">Make discount on best Merchant</button>
+            <button class = "btn_style" onclick="ajaxBestMerchantsDiscountRequest()">Make discount on best Merchant</button>
         </div>
         <div id="searchTab" class="tab-pane fade">
             <div id="searchResults"></div>

@@ -104,8 +104,8 @@
                     for (String id : month) {
             %>
             <tr>
-                <td class="text-right" id="bestMerchant<%=monthCnt%>"><%= monthCnt%></td>
-                <td><%= id%></td>
+                <td class="text-right"><%= monthCnt%></td>
+                <td id="bestMerchant<%=monthCnt%>"><%= id%></td>
             </tr>
             <%monthCnt++;
                 }
