@@ -33,7 +33,7 @@
         Company c = user.getCompany();
         Civilian ci = user.getEmployeeCivilian();
         name = ci.getName();
-        debt = c.getDebt();
+        debt = ci.getDebt();
         companyId = c.getId();
         companyName = c.getName();
         creditBalance = c.getCreditBalance();

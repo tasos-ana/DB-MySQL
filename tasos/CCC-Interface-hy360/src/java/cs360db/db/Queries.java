@@ -1,6 +1,7 @@
 package cs360db.db;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 /**
  *
@@ -453,10 +454,60 @@ public class Queries {
 
     public static String getHalfCustomers(String table, String companyID) {
         StringBuilder insQuery = new StringBuilder();
-        insQuery
-                .append(" SELECT id FROM ").append("employee_").append(table)
+
+        insQuery.append(" SELECT id FROM ").append("employee_").append(table)
                 .append(" WHERE company_id = '").append(companyID).append("'");
 
+        return insQuery.toString();
+    }
+
+    public static String getBestMerchant() {
+        StringBuilder insQuery = new StringBuilder();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new java.util.Date());
+
+        cal.add(Calendar.DATE, -cal.get(java.util.Calendar.DAY_OF_MONTH));
+        java.util.Date monthEnd = cal.getTime();
+
+        cal.add(Calendar.DATE, -cal.get(java.util.Calendar.DAY_OF_MONTH) + 1);
+        java.util.Date monthStart = cal.getTime();
+
+        java.sql.Date theMonthStart = new java.sql.Date(monthStart.getTime());
+        java.sql.Date theMonthEnd = new java.sql.Date(monthEnd.getTime());
+
+        insQuery.append(" SELECT allTransactions.merchant as ID, SUM(allTransactions.valueSum) AS profit FROM ")
+                .append(" (SELECT t.Merchant_ID AS merchant, SUM(t.value) as valueSum FROM merchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION ")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM merchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(t.value) as valueSum FROM merchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM merchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' GROUP BY t.merchant_id ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(t.value) as valueSum FROM emerchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM emerchant_transaction_civilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(t.value) as valueSum FROM emerchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'charge' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID ")
+                .append(" UNION")
+                .append(" SELECT t.Employee_Merchant_ID AS merchant, SUM(-t.value) as valueSum FROM emerchant_transaction_ecivilian t")
+                .append(" WHERE t.TYPE = 'credit' AND t.DATE BETWEEN '" + theMonthStart + "' AND '" + theMonthEnd + "' ")
+                .append(" GROUP BY t.Employee_Merchant_ID)")
+                .append(" AS allTransactions")
+                .append(" GROUP BY allTransactions.merchant")
+                .append(" ORDER BY profit DESC");
+        System.out.println(insQuery.toString());
         return insQuery.toString();
     }
 

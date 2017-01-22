@@ -411,7 +411,7 @@ public class CompanyServlet extends HttpServlet {
         //get from db the user an opportunity to check if user added correctly
         context.setAttribute("good", dbAPI.getGoodCustomers());
         context.setAttribute("bad", dbAPI.getBadCustomers());
-        context.setAttribute("month", dbAPI.getMonthMerchants());
+        context.setAttribute("month", dbAPI.getBestMerchant());
         forwardToPage(request, response, url.toString());
     }
 

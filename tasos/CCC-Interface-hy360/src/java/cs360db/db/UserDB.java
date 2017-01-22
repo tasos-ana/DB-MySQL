@@ -246,7 +246,7 @@ class UserDB {
         try (Connection con = dbAPI.getConnection();
                 Statement stmt = con.createStatement()) {
             String insQuery;
-            insQuery = Queries.getHalfCustomers(table,companyID);
+            insQuery = Queries.getHalfCustomers(table, companyID);
 
             stmt.execute(insQuery);
             ResultSet res = stmt.getResultSet();
@@ -266,19 +266,33 @@ class UserDB {
         return halfCustomerIDs;
     }
 
-    protected static ArrayList<String> getArray(String insQuery) throws ClassNotFoundException {
+    protected static ArrayList<String> getArray(String insQuery, boolean takeAll) throws ClassNotFoundException {
         ArrayList<String> data = new ArrayList<>();
         try (Connection con = dbAPI.getConnection();
                 Statement stmt = con.createStatement()) {
 
             stmt.execute(insQuery);
             ResultSet res = stmt.getResultSet();
-
-            while (res.next() == true) {
-                data.add(res.getString("ID"));
-                try {
-                    data.add(res.getString("Debt"));
-                } catch (SQLException e) {
+            if (takeAll) {
+                while (res.next() == true) {
+                    data.add(res.getString("ID"));
+                    try {
+                        data.add(res.getString("Debt"));
+                    } catch (SQLException e) {
+                    }
+                }
+            } else {
+                double maxProfit = -1;
+                while (res.next() == true) {
+                    double currProfit = Double.parseDouble(res.getString("profit"));
+                    if (maxProfit == -1) {
+                        //init max
+                        maxProfit = currProfit;
+                    }
+                    if (maxProfit != currProfit) {
+                        break;
+                    }
+                    data.add(res.getString("ID"));
                 }
             }
 
