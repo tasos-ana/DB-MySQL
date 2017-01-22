@@ -7,7 +7,6 @@
 <%@page import="cs360db.model.Company"%>
 <%@page import="cs360db.model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!--TODO oi etairies na mporoun na kanoun add enan ergazomeno me ton logariasmo tous-->
 
 <%
     ServletContext context = getServletContext();
@@ -35,8 +34,9 @@
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#home" class="darkcolor"
                               onclick="document.getElementById('home_link').click();">Home</a></li>
-        <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Add employee</a></li>
-        <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
+        <li><a data-toggle="tab" href="#addEmployee" class="darkcolor">Employee Actions</a></li>
+        <li><a data-toggle="tab" href="#searchTab" class="darkcolor" 
+               onclick="ajaxSearchRequest(); ajaxUsersDropdownRequest('searchCompany')">Search</a></li>
     </ul>
 
     <div class="tab-content">
@@ -107,9 +107,7 @@
                         <div class='col-sm-3'></div>
                         <div class="title_text col-sm-2">Employee id:</div>
                         <div class='col-sm-1'></div>
-                        <input class='col-sm-3' type="text" name="removeAccountId" id="removeUsrEMAIL"
-                               placeholder="Type the employee login email" onchange="validationAPI.hasEmployee()">
-                        <div id="removeUsrEMAIL_err" class="col-sm-3 text-left" style="color: red;">*</div>
+                        <select id="employeeName" class='col-sm-3'></select>
                     </div>
                 </div>
                 <p></p>
@@ -118,8 +116,10 @@
                     <div class="title_text col-sm-2">Account type:</div>
                     <div class='col-sm-1'></div>
                     <div class='col-sm-3'>
-                        <input type="radio" name="accountType" value="civilian" checked onclick="validationAPI.hasEmployee()">Customer
-                        <input type="radio" name="accountType" value="merchant" onclick="validationAPI.hasEmployee()">Merchant
+                        <input type="radio" name="accountType" value="civilian" checked  
+                               onclick="ajaxUsersDropdownRequest('halfCompany', 'civilian')">Customer
+                        <input type="radio" name="accountType" value="merchant" 
+                               onclick="ajaxUsersDropdownRequest('halfCompany', 'civilian')">Merchant
                     </div>
                     <div class='col-sm-3'></div>
                 </div>
@@ -142,8 +142,10 @@
                 </div>
             </form>
         </div>
-        <div id="search" class="tab-pane fade">
-
+        <div id="searchTab" class="tab-pane fade">
+            <div id="searchResults"></div>
+            <div id="search">
+            </div>
         </div>
     </div>
     <div class="row" id="cccCustomersInfoContainer"></div>

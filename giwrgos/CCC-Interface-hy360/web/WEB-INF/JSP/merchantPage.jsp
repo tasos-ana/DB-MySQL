@@ -6,7 +6,6 @@
 
 <%@page import="cs360db.model.Merchant"%>
 <%@page import="cs360db.model.Company"%>
-<%@page import="cs360db.model.MerchantCreditCard"%>
 <%@page import="cs360db.model.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
@@ -40,14 +39,6 @@
         accountNumber = c.getAccountNumber();
     }
 %>
-<script>
-    $(function () {
-        $("#datepickerfrom").datepicker();
-    });
-    $(function () {
-        $("#datepickerbefore").datepicker();
-    });
-</script>
 <div class="container">
     <h2>Merchant dashboard</h2>
 
@@ -56,7 +47,8 @@
                               onclick="document.getElementById('home_link').click();">Home</a></li>
         <li><a data-toggle="tab" href="#debt" class="darkcolor"
                onclick="updateMerchantDebt()">Debt</a></li>
-        <li><a data-toggle="tab" href="#search" class="darkcolor">Search</a></li>
+        <li><a data-toggle="tab" href="#searchTab" class="darkcolor"
+               onclick="ajaxSearchRequest(); ajaxUsersDropdownRequest('searchCivilian')">Search</a></li>
     </ul>
     <div class="tab-content">
         <div id="home" class="tab-pane fade in active">
@@ -113,22 +105,9 @@
                 </fieldset>
             </form>
         </div>
-        <div id="search" class="tab-pane fade">
-            <form>
-                <fieldset>
-                    <legend class="legend_text">Search</legend>
-                    <fieldset>
-                        <legend class="legend_text">Dealings</legend>
-                        <span>Date from: <input type="text" id="datepickerfrom" size='11'></span>
-                        <span>Date before: <input type="text" id="datepickerbefore" size='11'></span><br>
-                        <button type="button" class="btn btn-default btn_style"  
-                                onclick="">
-                            Refund now
-                        </button>
-                    </fieldset>
-                </fieldset>
-            </form>
+        <div id="searchTab" class="tab-pane fade">
+            <div id="searchResults"></div>
+            <div id="search"></div>
         </div>
+        <div class="row" id="cccCustomersInfoContainer"></div>
     </div>
-    <div class="row" id="cccCustomersInfoContainer"></div>
-</div>

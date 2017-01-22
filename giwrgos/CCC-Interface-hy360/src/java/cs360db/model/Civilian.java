@@ -39,7 +39,7 @@ public class Civilian {
             this.validThru = null;
             this.creditLimit = -1;
             this.creditBalance = -1;
-            this.debt = -1;
+            this.debt = 0;
         } else {
             initAccountNumber();
             initValidThru();
@@ -114,8 +114,7 @@ public class Civilian {
 
     public boolean isValidEmployee() {
         return (this.accountNumber == -1 && this.validThru == null
-                && this.creditLimit == -1 && this.creditBalance == -1
-                && this.debt == -1);
+                && this.creditLimit == -1 && this.creditBalance == -1);
     }
 
     /**
